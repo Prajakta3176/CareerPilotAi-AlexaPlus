@@ -4,7 +4,7 @@
 > **Workspace:** `apps/simulator/`  
 > **Target Track:** Amazon Developer Hackathon 2026 — Alexa+ Track  
 > **Tech Stack:** React 19, TypeScript 5.7+, Vite 6, Vanilla CSS Design System (Glassmorphism & Dark Mode)  
-> **Key References:** [ChartKeep MCP](https://github.com/sherotree/chartkeep-mcp), [Alexa+ Smart Home](https://github.com/guptachetan1995/alexa-plus), Amazon Developer Hackathon Team Guide
+> **Key References:** [Alexa+ Smart Home](https://github.com/guptachetan1995/alexa-plus), Amazon Developer Hackathon Team Guide
 
 ---
 
@@ -206,14 +206,14 @@ graph TD
 
 | Deliverable | Location | Status | Hackathon Checkpoint |
 |---|---|---|---|
-| Phase 1: Design System & Layout | `src/styles/index.css`, `App.tsx` | ⏳ Ready to build | Layout & Branding |
-| Phase 2: State Store & API Client | `src/lib/api.ts`, `src/types/` | ⏳ Ready to build | Architecture contract |
-| Phase 3: Sample Mode & Onboarding | `src/components/JobInputForm.tsx` | ⏳ Ready to build | Checkpoint 1: Input |
-| Phase 4: Alexa+ Chat Panel | `src/components/ChatPanel.tsx` | ⏳ Ready to build | Simulated Voice Chat |
-| Phase 5: Skill Gap & 5-Day Plan | `SkillGapPanel.tsx`, `PlanTimeline.tsx` | ⏳ Ready to build | Checkpoint 2: Analysis & Plan |
-| Phase 6: Adaptive Quiz & Adaptation | `src/components/QuizPanel.tsx` | ⏳ Ready to build | Checkpoint 4: Adaptation Loop |
-| Phase 7: Live MCP Tool Trace | `src/components/ToolTrace.tsx` | ⏳ Ready to build | Checkpoint 3: Tool Trace Proof |
-| Phase 8: Production Build Test | `apps/simulator/dist/` | ⏳ Ready to test | Submission Deliverable |
+| Phase 1: Design System & Layout | `src/styles/index.css`, `App.tsx` | ✅ Completed | Layout & Branding |
+| Phase 2: State Store & API Client | `src/lib/api.ts`, `src/types/` | ✅ Completed | Architecture contract |
+| Phase 3: Sample Mode & Onboarding | `src/components/JobInputForm.tsx` | ✅ Completed | Checkpoint 1: Input |
+| Phase 4: Alexa+ Chat Panel | `src/components/ChatPanel.tsx` | ✅ Completed | Simulated Voice Chat |
+| Phase 5: Skill Gap & 5-Day Plan | `SkillGapPanel.tsx`, `PlanTimeline.tsx` | ✅ Completed | Checkpoint 2: Analysis & Plan |
+| Phase 6: Adaptive Quiz & Adaptation | `src/components/QuizPanel.tsx` | ✅ Completed | Checkpoint 4: Adaptation Loop |
+| Phase 7: Live MCP Tool Trace | `src/components/ToolTrace.tsx` | ✅ Completed | Checkpoint 3: Tool Trace Proof |
+| Phase 8: Production Build Test | `apps/simulator/dist/` | ✅ Verified in Browser | Submission Deliverable |
 
 ---
 
