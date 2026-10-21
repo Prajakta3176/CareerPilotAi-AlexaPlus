@@ -1,0 +1,37 @@
+{
+  "name": "careerpilot-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered career preparation assistant — Amazon Developer Hackathon 2026, Alexa+ Track",
+  "scripts": {
+    "dev": "concurrently --names web,server,mcp --prefix-colors cyan,yellow,magenta \"npm run dev:web\" \"npm run dev:server\" \"npm run dev:mcp\"",
+    "dev:web": "npm run dev --workspace=apps/simulator",
+    "dev:server": "npm run dev --workspace=server",
+    "dev:mcp": "npm run dev --workspace=mcp-server",
+    "build": "npm run build --workspace=apps/simulator",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "workspaces": [
+    "apps/simulator",
+    "server",
+    "mcp-server"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "alexa-plus",
+    "mcp",
+    "career",
+    "hackathon",
+    "amazon"
+  ],
+  "license": "MIT"
+}

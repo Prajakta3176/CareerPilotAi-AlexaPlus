@@ -1,0 +1,41 @@
+{
+  "name": "Alex Morgan",
+  "email": "alex.morgan@example.com",
+  "headline": "Full-Stack Developer with 3 years experience building React and Node.js web applications",
+  "summary": "Full-Stack Software Engineer with 3+ years of experience specializing in React frontends, TypeScript, and Express APIs. Proven track record of improving web app performance and shipping responsive customer-facing features. Looking to expand into cloud architecture and distributed systems.",
+  "skills": [
+    "JavaScript",
+    "TypeScript",
+    "React",
+    "Next.js",
+    "Node.js",
+    "Express",
+    "HTML5 / CSS3",
+    "Git",
+    "TailwindCSS",
+    "PostgreSQL",
+    "Jest"
+  ],
+  "experience": [
+    {
+      "role": "Frontend / Full-Stack Engineer",
+      "company": "Apex Web Tech",
+      "duration": "2023 - Present",
+      "highlights": [
+        "Built responsive client portals with React and TypeScript, boosting engagement by 35%.",
+        "Created Node.js REST endpoints for user authentication and profile management.",
+        "Integrated PostgreSQL database models using Prisma ORM."
+      ]
+    },
+    {
+      "role": "Junior Web Developer",
+      "company": "PixelCraft Studios",
+      "duration": "2021 - 2023",
+      "highlights": [
+        "Maintained single-page applications using JavaScript, HTML, and CSS.",
+        "Refactored legacy codebases to modern TypeScript standards."
+      ]
+    }
+  ],
+  "education": "B.S. in Computer Science, State University (2021)"
+}

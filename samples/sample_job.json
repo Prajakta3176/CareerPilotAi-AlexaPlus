@@ -1,0 +1,7 @@
+{
+  "title": "Senior Full-Stack Engineer",
+  "company": "CloudScale Innovations",
+  "location": "Seattle, WA (Hybrid)",
+  "experience": "4+ years",
+  "description": "We are seeking an experienced Full-Stack Engineer to architect, build, and scale our next-generation distributed SaaS platform. You will collaborate closely with product and infrastructure teams to deliver high-throughput, low-latency microservices and responsive user interfaces.\n\nKey Responsibilities:\n- Design and implement end-to-end features using TypeScript, React 19, and Node.js.\n- Architect resilient REST and GraphQL APIs backed by PostgreSQL and Redis.\n- Build distributed event-driven workflows leveraging AWS (Lambda, SQS, DynamoDB).\n- Ensure reliability, observability, and 99.99% uptime with CI/CD and automated testing.\n- Mentor junior developers and participate in architectural design reviews.\n\nRequired Qualifications:\n- 4+ years of professional full-stack development experience.\n- Deep expertise in TypeScript, React, and modern CSS/state management.\n- Hands-on experience with Node.js microservices and SQL/NoSQL databases.\n- Strong grasp of distributed systems concepts, caching strategies, and REST API design.\n- Familiarity with AWS cloud services and Docker containerization.\n- Excellent problem-solving skills and communication in cross-functional teams."
+}
