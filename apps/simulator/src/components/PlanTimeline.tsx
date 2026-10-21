@@ -20,22 +20,22 @@ export default function PlanTimeline() {
       <div className="placeholder-panel">
         <div
           style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(0, 200, 255, 0.1)',
+            width: '52px',
+            height: '52px',
+            borderRadius: 'var(--radius-lg)',
+            backgroundColor: 'var(--color-primary-subtle)',
+            color: 'var(--color-primary)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: '1rem',
-            color: 'var(--color-alexa-cyan)',
           }}
         >
-          <Calendar size={28} />
+          <Calendar size={26} />
         </div>
-        <h2 style={{ color: '#fff', fontSize: '1.25rem', marginBottom: '0.5rem' }}>No Study Plan Generated Yet</h2>
-        <p style={{ color: 'var(--color-text-secondary)', maxWidth: '420px', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-          CareerPilot AI generates a personalized multi-day timeline focused on your identified skill gaps.
+        <h2>No Study Plan Generated Yet</h2>
+        <p>
+          CareerPilot AI generates a personalized multi-day preparation timeline structured around your verified skill gaps.
         </p>
         <button
           type="button"
@@ -45,11 +45,11 @@ export default function PlanTimeline() {
         >
           {isPlanning ? (
             <>
-              <Loader2 size={16} className="spinner" /> Generating Plan...
+              <Loader2 size={15} className="spinner" /> Generating Plan...
             </>
           ) : (
             <>
-              <Sparkles size={16} /> Generate 5-Day Plan Now
+              <Sparkles size={15} /> Generate 5-Day Plan
             </>
           )}
         </button>
@@ -65,7 +65,7 @@ export default function PlanTimeline() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* ── Top Plan Header ── */}
       <div
-        className="glass-card"
+        className="card"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -79,15 +79,15 @@ export default function PlanTimeline() {
             style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '0.72rem',
-              color: 'var(--color-alexa-cyan)',
+              color: 'var(--color-primary)',
               textTransform: 'uppercase',
-              letterSpacing: '0.05em',
+              fontWeight: 600,
             }}
           >
-            Personalized Curriculum
+            Personalized Roadmap
           </span>
-          <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#fff', margin: '0.2rem 0' }}>
-            {plan.targetRole || 'Full-Stack Developer'} — Preparation Roadmap
+          <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: '0.15rem 0 0.35rem 0' }}>
+            {plan.targetRole || 'Full-Stack Developer'} — Preparation Timeline
           </h3>
           <div style={{ display: 'flex', gap: '1rem', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
@@ -97,21 +97,21 @@ export default function PlanTimeline() {
               <Clock size={14} /> {plan.dailyMinutes} mins / day
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-              <CheckSquare size={14} /> {completedCount} of {plan.schedule.length} Days Done
+              <CheckSquare size={14} /> {completedCount} of {plan.schedule.length} Days Complete
             </span>
           </div>
         </div>
 
-        {/* Progress Bar */}
+        {/* Progress Indicator */}
         <div style={{ minWidth: '160px', textAlign: 'right' }}>
-          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-alexa-cyan)', marginBottom: '0.3rem' }}>
-            {progressPct}% Done
+          <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-primary)', marginBottom: '0.25rem' }}>
+            {progressPct}% Completed
           </div>
           <div
             style={{
               width: '100%',
-              height: '8px',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              height: '7px',
+              backgroundColor: 'var(--color-bg-subtle)',
               borderRadius: 'var(--radius-full)',
               overflow: 'hidden',
             }}
@@ -120,57 +120,57 @@ export default function PlanTimeline() {
               style={{
                 width: `${progressPct}%`,
                 height: '100%',
-                background: 'var(--gradient-alexa)',
-                transition: 'width 300ms ease',
+                backgroundColor: 'var(--color-primary)',
+                transition: 'width 250ms ease',
               }}
             />
           </div>
         </div>
       </div>
 
-      {/* ── Adaptation Alert Banner (Hackathon Rubric Highlight) ── */}
+      {/* ── Adaptation Alert Banner ── */}
       {hasAdaptedDay && (
         <div
-          className="glass-card"
+          className="card"
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '0.75rem',
-            padding: '0.85rem 1.25rem',
-            backgroundColor: 'rgba(168, 85, 247, 0.12)',
-            borderColor: 'rgba(168, 85, 247, 0.4)',
+            padding: '0.85rem 1.15rem',
+            backgroundColor: 'var(--color-purple-bg)',
+            borderColor: 'var(--color-purple-border)',
           }}
         >
-          <AlertCircle size={18} color="#c084fc" style={{ flexShrink: 0 }} />
-          <div style={{ fontSize: '0.82rem', color: '#e9d5ff', lineHeight: '1.4' }}>
-            <strong>Plan Dynamically Adapted:</strong> Following your adaptive quiz result, Day 4 was automatically restructured to reinforce key technical fundamentals before your mock interview.
+          <AlertCircle size={18} color="var(--color-purple)" style={{ flexShrink: 0 }} />
+          <div style={{ fontSize: '0.84rem', color: '#581c87', lineHeight: '1.45' }}>
+            <strong>Curriculum Dynamically Adapted:</strong> Following your adaptive quiz result, Day 4 was automatically reorganized to reinforce key technical fundamentals before your mock interview.
           </div>
         </div>
       )}
 
       {/* ── Day by Day Timeline Cards ── */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
         {plan.schedule.map((day) => {
           return (
             <div
               key={day.day}
-              className="glass-card"
+              className="card"
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'auto 1fr auto',
                 gap: '1.25rem',
                 alignItems: 'flex-start',
                 borderColor: day.adapted
-                  ? 'rgba(168, 85, 247, 0.4)'
+                  ? 'var(--color-purple-border)'
                   : day.completed
-                  ? 'rgba(16, 185, 129, 0.35)'
+                  ? 'var(--color-success-border)'
                   : 'var(--color-border)',
                 backgroundColor: day.completed
-                  ? 'rgba(16, 185, 129, 0.04)'
-                  : 'rgba(30, 41, 59, 0.5)',
+                  ? 'var(--color-success-bg)'
+                  : '#ffffff',
               }}
             >
-              {/* Day Number Column */}
+              {/* Day Number Box */}
               <div style={{ textAlign: 'center' }}>
                 <div
                   style={{
@@ -178,15 +178,15 @@ export default function PlanTimeline() {
                     height: '42px',
                     borderRadius: 'var(--radius-md)',
                     backgroundColor: day.completed
-                      ? 'rgba(16, 185, 129, 0.2)'
+                      ? 'var(--color-success)'
                       : day.adapted
-                      ? 'rgba(168, 85, 247, 0.2)'
-                      : 'rgba(0, 200, 255, 0.15)',
+                      ? 'var(--color-purple-bg)'
+                      : 'var(--color-primary-subtle)',
                     color: day.completed
-                      ? '#10b981'
+                      ? '#ffffff'
                       : day.adapted
-                      ? '#c084fc'
-                      : 'var(--color-alexa-cyan)',
+                      ? 'var(--color-purple)'
+                      : 'var(--color-primary)',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
@@ -201,8 +201,8 @@ export default function PlanTimeline() {
 
               {/* Day Content */}
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>
-                  <h4 style={{ fontSize: '0.96rem', fontWeight: 600, color: '#fff', margin: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
+                  <h4 style={{ fontSize: '0.96rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>
                     {day.topic}
                   </h4>
 
@@ -213,18 +213,18 @@ export default function PlanTimeline() {
                         fontWeight: 600,
                         padding: '0.15rem 0.5rem',
                         borderRadius: 'var(--radius-full)',
-                        backgroundColor: 'rgba(168, 85, 247, 0.2)',
-                        color: '#c084fc',
-                        border: '1px solid rgba(168, 85, 247, 0.4)',
+                        backgroundColor: 'var(--color-purple-bg)',
+                        color: 'var(--color-purple)',
+                        border: '1px solid var(--color-purple-border)',
                       }}
                     >
-                      ⚡ Adapted by Quiz
+                      Adapted by Quiz
                     </span>
                   )}
 
                   <span
                     style={{
-                      fontSize: '0.72rem',
+                      fontSize: '0.74rem',
                       color: 'var(--color-text-muted)',
                       display: 'flex',
                       alignItems: 'center',
@@ -235,15 +235,15 @@ export default function PlanTimeline() {
                   </span>
                 </div>
 
-                <p style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)', margin: '0 0 0.6rem 0', lineHeight: '1.4' }}>
+                <p style={{ fontSize: '0.83rem', color: 'var(--color-text-secondary)', margin: '0 0 0.55rem 0', lineHeight: '1.45' }}>
                   <strong style={{ color: 'var(--color-text-primary)' }}>Objective:</strong> {day.objective}
                 </p>
 
                 {/* Hands-on Task Box */}
                 <div
                   style={{
-                    backgroundColor: 'rgba(7, 11, 20, 0.5)',
-                    padding: '0.55rem 0.85rem',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    padding: '0.55rem 0.75rem',
                     borderRadius: 'var(--radius-sm)',
                     border: '1px solid var(--color-border)',
                     fontSize: '0.78rem',
@@ -253,15 +253,15 @@ export default function PlanTimeline() {
                     gap: '0.45rem',
                   }}
                 >
-                  <BookOpen size={14} color="var(--color-alexa-cyan)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <BookOpen size={14} color="var(--color-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
                   <span>
                     <strong>Practice Task:</strong> {day.practiceTask}
                   </span>
                 </div>
               </div>
 
-              {/* Day Action Buttons */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', minWidth: '135px' }}>
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', minWidth: '130px' }}>
                 <button
                   type="button"
                   onClick={() => toggleDayCompletion(day.day)}
@@ -273,9 +273,9 @@ export default function PlanTimeline() {
                     padding: '0.45rem 0.75rem',
                     borderRadius: 'var(--radius-md)',
                     border: '1px solid',
-                    borderColor: day.completed ? '#10b981' : 'var(--color-border)',
-                    backgroundColor: day.completed ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                    color: day.completed ? '#10b981' : 'var(--color-text-secondary)',
+                    borderColor: day.completed ? 'var(--color-success)' : 'var(--color-border)',
+                    backgroundColor: day.completed ? 'var(--color-success-bg)' : '#ffffff',
+                    color: day.completed ? 'var(--color-success)' : 'var(--color-text-secondary)',
                     fontSize: '0.78rem',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -307,9 +307,8 @@ export default function PlanTimeline() {
                     justifyContent: 'center',
                     gap: '0.35rem',
                   }}
-                  title="Generate adaptive 3-question quiz for this topic"
                 >
-                  <HelpCircle size={13} color="var(--color-alexa-cyan)" />
+                  <HelpCircle size={13} color="var(--color-primary)" />
                   Take Quiz
                 </button>
               </div>

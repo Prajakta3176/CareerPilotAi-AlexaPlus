@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import type { FormEvent } from 'react';
 import {
   Send,
   Mic,
@@ -7,7 +8,7 @@ import {
   User,
   Sparkles,
   Zap,
-  Activity,
+  Info,
 } from 'lucide-react';
 import { useSimulator } from '../context/SimulatorContext';
 
@@ -28,12 +29,11 @@ export default function ChatPanel() {
 
   const isBusy = isAnalyzing || isPlanning || isQuizzing || isSubmittingQuiz;
 
-  // Auto-scroll to bottom of messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isBusy]);
 
-  const handleSend = async (e?: React.FormEvent) => {
+  const handleSend = async (e?: FormEvent) => {
     if (e) e.preventDefault();
     const trimmed = input.trim();
     if (!trimmed || isBusy) return;
@@ -51,16 +51,15 @@ export default function ChatPanel() {
       setIsListening(false);
     } else {
       setIsListening(true);
-      // Simulate voice speech-to-text prompt after brief delay
       setTimeout(() => {
         setIsListening(false);
         setInput('Generate a 5-day study plan based on my skill gaps');
-      }, 2200);
+      }, 1800);
     }
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: 'var(--color-bg-surface)' }}>
       {/* ── Chat Header ── */}
       <div
         style={{
@@ -69,22 +68,21 @@ export default function ChatPanel() {
           justifyContent: 'space-between',
           padding: '0.85rem 1.25rem',
           borderBottom: '1px solid var(--color-border)',
-          background: 'rgba(15, 23, 42, 0.7)',
+          backgroundColor: 'var(--color-bg-surface)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
           <div
             style={{
-              width: '10px',
-              height: '10px',
+              width: '8px',
+              height: '8px',
               borderRadius: '50%',
-              backgroundColor: '#10b981',
-              boxShadow: '0 0 8px #10b981',
+              backgroundColor: 'var(--color-success)',
             }}
           />
           <div>
-            <h2 style={{ fontSize: '0.88rem', fontWeight: 600, color: '#fff', margin: 0 }}>
-              Alexa+ Voice & Agent Stream
+            <h2 style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>
+              Alexa+ Assistant Stream
             </h2>
             <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
               Connected to MCP Runtime (Port 8787)
@@ -92,24 +90,18 @@ export default function ChatPanel() {
           </div>
         </div>
 
-        {/* Audio Wave Visualizer Simulation */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '3px', height: '18px' }}>
-          {[0.4, 0.9, 0.6, 1.0, 0.5, 0.8, 0.3].map((scale, i) => (
-            <div
-              key={i}
-              style={{
-                width: '3px',
-                height: `${scale * 100}%`,
-                backgroundColor: isListening || isBusy ? 'var(--color-alexa-cyan)' : 'rgba(148, 163, 184, 0.3)',
-                borderRadius: '2px',
-                animation: isListening || isBusy ? `pulseWave 1.${i + 2}s infinite ease-in-out` : 'none',
-              }}
-            />
-          ))}
-        </div>
+        <span
+          style={{
+            fontSize: '0.72rem',
+            color: isListening ? 'var(--color-danger)' : 'var(--color-text-muted)',
+            fontWeight: 500,
+          }}
+        >
+          {isListening ? 'Listening...' : 'Voice & Text Active'}
+        </span>
       </div>
 
-      {/* ── Message History Stream ── */}
+      {/* ── Message Stream ── */}
       <div
         style={{
           flex: 1,
@@ -118,6 +110,7 @@ export default function ChatPanel() {
           display: 'flex',
           flexDirection: 'column',
           gap: '1rem',
+          backgroundColor: '#fafbfc',
         }}
       >
         {messages.map((msg) => {
@@ -132,16 +125,17 @@ export default function ChatPanel() {
                   alignSelf: 'center',
                   padding: '0.35rem 0.85rem',
                   borderRadius: 'var(--radius-full)',
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  backgroundColor: 'var(--color-bg-surface)',
                   border: '1px solid var(--color-border)',
                   fontSize: '0.75rem',
                   color: 'var(--color-text-secondary)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.4rem',
+                  boxShadow: 'var(--shadow-xs)',
                 }}
               >
-                <Activity size={13} color="var(--color-alexa-cyan)" />
+                <Info size={13} color="var(--color-primary)" />
                 {msg.content}
               </div>
             );
@@ -152,51 +146,52 @@ export default function ChatPanel() {
               key={msg.id}
               style={{
                 display: 'flex',
-                gap: '0.75rem',
+                gap: '0.65rem',
                 alignSelf: isAssistant ? 'flex-start' : 'flex-end',
-                maxWidth: '85%',
+                maxWidth: '88%',
                 flexDirection: isAssistant ? 'row' : 'row-reverse',
               }}
             >
               {/* Avatar */}
               <div
                 style={{
-                  width: '30px',
-                  height: '30px',
-                  borderRadius: '50%',
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: 'var(--radius-md)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
-                  backgroundColor: isAssistant ? 'rgba(0, 200, 255, 0.15)' : 'rgba(99, 102, 241, 0.2)',
-                  border: `1px solid ${isAssistant ? 'rgba(0, 200, 255, 0.4)' : 'rgba(99, 102, 241, 0.4)'}`,
-                  color: isAssistant ? 'var(--color-alexa-cyan)' : '#818cf8',
+                  backgroundColor: isAssistant ? 'var(--color-primary-subtle)' : '#1e293b',
+                  color: isAssistant ? 'var(--color-primary)' : '#ffffff',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
                 }}
               >
-                {isAssistant ? <Bot size={16} /> : <User size={16} />}
+                {isAssistant ? <Bot size={15} /> : <User size={15} />}
               </div>
 
-              {/* Message Bubble */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              {/* Message Content */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <div
                   style={{
-                    padding: '0.8rem 1rem',
+                    padding: '0.75rem 0.95rem',
                     borderRadius: 'var(--radius-lg)',
                     borderTopLeftRadius: isAssistant ? '0.2rem' : 'var(--radius-lg)',
                     borderTopRightRadius: !isAssistant ? '0.2rem' : 'var(--radius-lg)',
-                    backgroundColor: isAssistant ? 'rgba(30, 41, 59, 0.85)' : 'rgba(0, 200, 255, 0.18)',
-                    border: `1px solid ${isAssistant ? 'var(--color-border)' : 'rgba(0, 200, 255, 0.4)'}`,
-                    color: '#fff',
-                    fontSize: '0.85rem',
+                    backgroundColor: isAssistant ? '#ffffff' : 'var(--color-primary)',
+                    border: isAssistant ? '1px solid var(--color-border)' : 'none',
+                    color: isAssistant ? 'var(--color-text-primary)' : '#ffffff',
+                    fontSize: '0.84rem',
                     lineHeight: '1.5',
-                    boxShadow: isAssistant ? '0 2px 8px rgba(0,0,0,0.3)' : '0 0 12px rgba(0, 200, 255, 0.15)',
+                    boxShadow: 'var(--shadow-xs)',
                   }}
                 >
                   <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{msg.content}</p>
 
-                  {/* Inline Tool Call Badges */}
+                  {/* Inline Tool Execution Pill */}
                   {msg.toolCalls && msg.toolCalls.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.6rem' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginTop: '0.5rem' }}>
                       {msg.toolCalls.map((tName) => (
                         <button
                           key={tName}
@@ -205,22 +200,20 @@ export default function ChatPanel() {
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '0.35rem',
-                            padding: '0.25rem 0.55rem',
+                            gap: '0.3rem',
+                            padding: '0.2rem 0.5rem',
                             borderRadius: 'var(--radius-sm)',
-                            backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                            border: '1px solid rgba(0, 200, 255, 0.35)',
-                            color: 'var(--color-alexa-cyan)',
+                            backgroundColor: isAssistant ? 'var(--color-bg-subtle)' : 'rgba(255, 255, 255, 0.2)',
+                            border: isAssistant ? '1px solid var(--color-border)' : 'none',
+                            color: isAssistant ? 'var(--color-primary)' : '#ffffff',
                             fontFamily: 'var(--font-mono)',
-                            fontSize: '0.72rem',
+                            fontSize: '0.7rem',
+                            fontWeight: 600,
                             cursor: 'pointer',
-                            transition: 'all 150ms ease',
                           }}
-                          title="Click to view MCP execution details in Tool Trace"
                         >
-                          <Zap size={12} />
+                          <Zap size={11} />
                           tool: {tName}
-                          <span style={{ opacity: 0.6 }}>→ Trace</span>
                         </button>
                       ))}
                     </div>
@@ -229,7 +222,7 @@ export default function ChatPanel() {
 
                 {/* Suggested Action Chips */}
                 {msg.suggestedActions && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.2rem' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginTop: '0.15rem' }}>
                     {msg.suggestedActions.map((act) => (
                       <button
                         key={act}
@@ -239,17 +232,19 @@ export default function ChatPanel() {
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '0.3rem',
-                          padding: '0.25rem 0.65rem',
+                          padding: '0.25rem 0.6rem',
                           borderRadius: 'var(--radius-full)',
-                          backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                          border: '1px solid rgba(255, 255, 255, 0.12)',
+                          backgroundColor: '#ffffff',
+                          border: '1px solid var(--color-border)',
                           color: 'var(--color-text-secondary)',
-                          fontSize: '0.74rem',
+                          fontSize: '0.73rem',
+                          fontWeight: 500,
                           cursor: 'pointer',
-                          transition: 'all 150ms ease',
+                          boxShadow: 'var(--shadow-xs)',
+                          transition: 'all 120ms ease',
                         }}
                       >
-                        <Sparkles size={11} color="var(--color-alexa-cyan)" />
+                        <Sparkles size={11} color="var(--color-primary)" />
                         {act}
                       </button>
                     ))}
@@ -258,7 +253,7 @@ export default function ChatPanel() {
 
                 <span
                   style={{
-                    fontSize: '0.68rem',
+                    fontSize: '0.67rem',
                     color: 'var(--color-text-muted)',
                     alignSelf: isAssistant ? 'flex-start' : 'flex-end',
                     padding: '0 0.2rem',
@@ -271,40 +266,48 @@ export default function ChatPanel() {
           );
         })}
 
-        {/* Agent Thinking Skeleton */}
+        {/* Processing State */}
         {isBusy && (
-          <div style={{ display: 'flex', gap: '0.75rem', alignSelf: 'flex-start', maxWidth: '80%' }}>
+          <div style={{ display: 'flex', gap: '0.65rem', alignSelf: 'flex-start' }}>
             <div
               style={{
-                width: '30px',
-                height: '30px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(0, 200, 255, 0.15)',
-                border: '1px solid rgba(0, 200, 255, 0.4)',
+                width: '28px',
+                height: '28px',
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--color-primary-subtle)',
+                color: 'var(--color-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--color-alexa-cyan)',
               }}
             >
-              <Bot size={16} />
+              <Bot size={15} />
             </div>
             <div
               style={{
-                padding: '0.75rem 1rem',
+                padding: '0.65rem 0.95rem',
                 borderRadius: 'var(--radius-lg)',
                 borderTopLeftRadius: '0.2rem',
-                backgroundColor: 'rgba(30, 41, 59, 0.6)',
+                backgroundColor: '#ffffff',
                 border: '1px solid var(--color-border)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.5rem',
+                gap: '0.45rem',
                 color: 'var(--color-text-secondary)',
                 fontSize: '0.8rem',
               }}
             >
-              <div className="spinner" style={{ width: '12px', height: '12px' }} />
-              Alexa+ is reasoning and executing MCP tools...
+              <div
+                className="spinner"
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  border: '2px solid #e2e8f0',
+                  borderTopColor: 'var(--color-primary)',
+                  borderRadius: '50%',
+                }}
+              />
+              CareerPilot is analyzing with MCP tools...
             </div>
           </div>
         )}
@@ -315,28 +318,24 @@ export default function ChatPanel() {
       {/* ── Input Bar ── */}
       <div
         style={{
-          padding: '0.85rem 1rem',
+          padding: '0.75rem 1rem',
           borderTop: '1px solid var(--color-border)',
-          backgroundColor: 'rgba(15, 23, 42, 0.85)',
-          backdropFilter: 'blur(12px)',
+          backgroundColor: 'var(--color-bg-surface)',
         }}
       >
-        <form onSubmit={handleSend} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          {/* Voice Mic Toggle */}
+        <form onSubmit={handleSend} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <button
             type="button"
             onClick={toggleVoice}
-            className="btn"
+            className="btn btn-secondary"
             style={{
-              padding: '0.6rem',
-              borderRadius: '50%',
-              backgroundColor: isListening ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255, 255, 255, 0.05)',
-              border: `1px solid ${isListening ? '#ef4444' : 'var(--color-border)'}`,
-              color: isListening ? '#ef4444' : 'var(--color-text-secondary)',
+              padding: '0.5rem',
+              borderRadius: 'var(--radius-md)',
+              color: isListening ? 'var(--color-danger)' : 'var(--color-text-secondary)',
             }}
-            title={isListening ? 'Listening...' : 'Simulate Voice Input'}
+            title={isListening ? 'Listening...' : 'Simulate voice speech'}
           >
-            {isListening ? <Mic size={17} /> : <MicOff size={17} />}
+            {isListening ? <Mic size={16} /> : <MicOff size={16} />}
           </button>
 
           <input
@@ -351,12 +350,12 @@ export default function ChatPanel() {
             disabled={isBusy}
             style={{
               flex: 1,
-              backgroundColor: 'rgba(7, 11, 20, 0.7)',
+              backgroundColor: 'var(--color-bg-surface)',
               border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-full)',
-              padding: '0.65rem 1.1rem',
+              borderRadius: 'var(--radius-md)',
+              padding: '0.55rem 0.85rem',
               color: 'var(--color-text-primary)',
-              fontSize: '0.85rem',
+              fontSize: '0.84rem',
               outline: 'none',
             }}
           />
@@ -366,12 +365,11 @@ export default function ChatPanel() {
             disabled={!input.trim() || isBusy}
             className="btn btn-primary"
             style={{
-              padding: '0.65rem 1rem',
-              borderRadius: 'var(--radius-full)',
-              opacity: !input.trim() || isBusy ? 0.4 : 1,
+              padding: '0.55rem 0.85rem',
+              opacity: !input.trim() || isBusy ? 0.5 : 1,
             }}
           >
-            <Send size={15} />
+            <Send size={14} />
           </button>
         </form>
       </div>

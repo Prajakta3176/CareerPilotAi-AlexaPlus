@@ -6,7 +6,7 @@ import {
   Quote,
   Sparkles,
   ArrowRight,
-  TrendingUp,
+  Lightbulb,
   Loader2,
   BrainCircuit,
 } from 'lucide-react';
@@ -22,22 +22,22 @@ export default function SkillGapPanel() {
       <div className="placeholder-panel">
         <div
           style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(0, 200, 255, 0.1)',
+            width: '52px',
+            height: '52px',
+            borderRadius: 'var(--radius-lg)',
+            backgroundColor: 'var(--color-primary-subtle)',
+            color: 'var(--color-primary)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: '1rem',
-            color: 'var(--color-alexa-cyan)',
           }}
         >
-          <BrainCircuit size={28} />
+          <BrainCircuit size={26} />
         </div>
-        <h2 style={{ color: '#fff', fontSize: '1.25rem', marginBottom: '0.5rem' }}>No Skill Gap Analysis Yet</h2>
-        <p style={{ color: 'var(--color-text-secondary)', maxWidth: '420px', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-          Paste your target job description and resume, or load the sample data to see structured matches, evidence quotes, and gaps.
+        <h2>No Skill Gap Analysis Yet</h2>
+        <p>
+          Input your job description and resume, or load the demo sample data to view matched competencies, evidence quotes, and gaps.
         </p>
         <button
           type="button"
@@ -53,11 +53,11 @@ export default function SkillGapPanel() {
         >
           {isAnalyzing ? (
             <>
-              <Loader2 size={16} className="spinner" /> Analyzing...
+              <Loader2 size={15} className="spinner" /> Analyzing...
             </>
           ) : (
             <>
-              Go to Onboarding / Run Analysis <ArrowRight size={15} />
+              Go to Step 1: Input & Run Analysis <ArrowRight size={14} />
             </>
           )}
         </button>
@@ -65,7 +65,6 @@ export default function SkillGapPanel() {
     );
   }
 
-  // Filter skills
   const allSkills: SkillItem[] = [
     ...comparison.matched,
     ...comparison.partial,
@@ -79,64 +78,61 @@ export default function SkillGapPanel() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-      {/* ── Top Summary Header ── */}
+      {/* ── Top Match Score Card ── */}
       <div
-        className="glass-card"
+        className="card"
         style={{
           display: 'grid',
           gridTemplateColumns: 'auto 1fr auto',
           gap: '1.5rem',
           alignItems: 'center',
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%)',
         }}
       >
-        {/* Match Score Meter */}
-        <div style={{ textAlign: 'center', minWidth: '100px' }}>
+        {/* Match Percentage */}
+        <div style={{ textAlign: 'center', minWidth: '90px' }}>
           <div
             style={{
-              fontSize: '2.4rem',
+              fontSize: '2.5rem',
               fontWeight: 800,
-              background: 'var(--gradient-alexa)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: 'var(--color-primary)',
               lineHeight: 1,
             }}
           >
             {comparison.matchScore}%
           </div>
-          <span style={{ fontSize: '0.74rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
             Role Match
           </span>
         </div>
 
-        {/* Breakdown Stats */}
-        <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+        {/* 3 Metric Counts */}
+        <div style={{ display: 'flex', gap: '1.75rem', flexWrap: 'wrap' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#10b981', fontWeight: 700, fontSize: '1.1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--color-success)', fontWeight: 700, fontSize: '1.15rem' }}>
               <CheckCircle2 size={16} />
               {comparison.matchedCount}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Verified Matches</span>
+            <span style={{ fontSize: '0.76rem', color: 'var(--color-text-secondary)' }}>Verified Skills</span>
           </div>
 
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#f59e0b', fontWeight: 700, fontSize: '1.1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--color-warning)', fontWeight: 700, fontSize: '1.15rem' }}>
               <AlertTriangle size={16} />
               {comparison.partialCount}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Partial / Inferred</span>
+            <span style={{ fontSize: '0.76rem', color: 'var(--color-text-secondary)' }}>Partial / Inferred</span>
           </div>
 
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#ef4444', fontWeight: 700, fontSize: '1.1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--color-danger)', fontWeight: 700, fontSize: '1.15rem' }}>
               <XCircle size={16} />
               {comparison.missingCount}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Critical Gaps</span>
+            <span style={{ fontSize: '0.76rem', color: 'var(--color-text-secondary)' }}>Critical Gaps</span>
           </div>
         </div>
 
-        {/* CTA to Generate Plan */}
+        {/* Action Button */}
         <div>
           <button
             type="button"
@@ -151,34 +147,36 @@ export default function SkillGapPanel() {
               </>
             ) : (
               <>
-                <Sparkles size={15} /> Build Study Plan <ArrowRight size={15} />
+                <Sparkles size={14} /> Build 5-Day Study Plan <ArrowRight size={14} />
               </>
             )}
           </button>
         </div>
       </div>
 
-      {/* ── AI Recommendation Insight ── */}
+      {/* ── AI Recommendation Callout ── */}
       <div
-        className="glass-card"
+        className="card"
         style={{
           display: 'flex',
           alignItems: 'center',
           gap: '0.75rem',
-          padding: '0.85rem 1.25rem',
-          borderColor: 'rgba(0, 200, 255, 0.3)',
-          backgroundColor: 'rgba(0, 200, 255, 0.05)',
+          padding: '0.85rem 1.15rem',
+          backgroundColor: 'var(--color-primary-subtle)',
+          borderColor: 'var(--color-primary-border)',
         }}
       >
-        <TrendingUp size={18} color="var(--color-alexa-cyan)" style={{ flexShrink: 0 }} />
-        <span style={{ fontSize: '0.82rem', color: 'var(--color-text-primary)', lineHeight: '1.4' }}>
-          <strong>Agent Recommendation:</strong> {comparison.recommendation}
+        <Lightbulb size={18} color="var(--color-primary)" style={{ flexShrink: 0 }} />
+        <span style={{ fontSize: '0.84rem', color: '#1e3a8a', lineHeight: '1.45' }}>
+          <strong>Preparation Strategy:</strong> {comparison.recommendation}
         </span>
       </div>
 
-      {/* ── Filter Pills ── */}
-      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-        <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginRight: '0.25rem' }}>Filter:</span>
+      {/* ── Filter Tabs ── */}
+      <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+        <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginRight: '0.25rem', fontWeight: 600 }}>
+          Filter:
+        </span>
         <button
           type="button"
           onClick={() => setFilter('all')}
@@ -186,10 +184,11 @@ export default function SkillGapPanel() {
             padding: '0.3rem 0.75rem',
             borderRadius: 'var(--radius-full)',
             border: '1px solid',
-            borderColor: filter === 'all' ? 'var(--color-alexa-cyan)' : 'var(--color-border)',
-            backgroundColor: filter === 'all' ? 'rgba(0, 200, 255, 0.15)' : 'transparent',
-            color: filter === 'all' ? '#fff' : 'var(--color-text-secondary)',
+            borderColor: filter === 'all' ? 'var(--color-primary)' : 'var(--color-border)',
+            backgroundColor: filter === 'all' ? 'var(--color-primary-subtle)' : '#ffffff',
+            color: filter === 'all' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
             fontSize: '0.78rem',
+            fontWeight: filter === 'all' ? 600 : 500,
             cursor: 'pointer',
           }}
         >
@@ -203,10 +202,11 @@ export default function SkillGapPanel() {
             padding: '0.3rem 0.75rem',
             borderRadius: 'var(--radius-full)',
             border: '1px solid',
-            borderColor: filter === 'matched' ? '#10b981' : 'var(--color-border)',
-            backgroundColor: filter === 'matched' ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
-            color: filter === 'matched' ? '#10b981' : 'var(--color-text-secondary)',
+            borderColor: filter === 'matched' ? 'var(--color-success)' : 'var(--color-border)',
+            backgroundColor: filter === 'matched' ? 'var(--color-success-bg)' : '#ffffff',
+            color: filter === 'matched' ? 'var(--color-success)' : 'var(--color-text-secondary)',
             fontSize: '0.78rem',
+            fontWeight: filter === 'matched' ? 600 : 500,
             cursor: 'pointer',
           }}
         >
@@ -220,10 +220,11 @@ export default function SkillGapPanel() {
             padding: '0.3rem 0.75rem',
             borderRadius: 'var(--radius-full)',
             border: '1px solid',
-            borderColor: filter === 'partial' ? '#f59e0b' : 'var(--color-border)',
-            backgroundColor: filter === 'partial' ? 'rgba(245, 158, 11, 0.15)' : 'transparent',
-            color: filter === 'partial' ? '#f59e0b' : 'var(--color-text-secondary)',
+            borderColor: filter === 'partial' ? 'var(--color-warning)' : 'var(--color-border)',
+            backgroundColor: filter === 'partial' ? 'var(--color-warning-bg)' : '#ffffff',
+            color: filter === 'partial' ? 'var(--color-warning)' : 'var(--color-text-secondary)',
             fontSize: '0.78rem',
+            fontWeight: filter === 'partial' ? 600 : 500,
             cursor: 'pointer',
           }}
         >
@@ -237,10 +238,11 @@ export default function SkillGapPanel() {
             padding: '0.3rem 0.75rem',
             borderRadius: 'var(--radius-full)',
             border: '1px solid',
-            borderColor: filter === 'missing' ? '#ef4444' : 'var(--color-border)',
-            backgroundColor: filter === 'missing' ? 'rgba(239, 68, 68, 0.15)' : 'transparent',
-            color: filter === 'missing' ? '#ef4444' : 'var(--color-text-secondary)',
+            borderColor: filter === 'missing' ? 'var(--color-danger)' : 'var(--color-border)',
+            backgroundColor: filter === 'missing' ? 'var(--color-danger-bg)' : '#ffffff',
+            color: filter === 'missing' ? 'var(--color-danger)' : 'var(--color-text-secondary)',
             fontSize: '0.78rem',
+            fontWeight: filter === 'missing' ? 600 : 500,
             cursor: 'pointer',
           }}
         >
@@ -248,30 +250,35 @@ export default function SkillGapPanel() {
         </button>
       </div>
 
-      {/* ── Skills Cards Grid ── */}
+      {/* ── Skill Cards Grid ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '0.85rem' }}>
         {displayedSkills.map((skill, idx) => {
           const isMatched = skill.matchType === 'matched';
           const isPartial = skill.matchType === 'partial';
 
-          const badgeColor = isMatched ? '#10b981' : isPartial ? '#f59e0b' : '#ef4444';
-          const badgeBg = isMatched
-            ? 'rgba(16, 185, 129, 0.15)'
+          const statusColor = isMatched ? 'var(--color-success)' : isPartial ? 'var(--color-warning)' : 'var(--color-danger)';
+          const statusBg = isMatched
+            ? 'var(--color-success-bg)'
             : isPartial
-            ? 'rgba(245, 158, 11, 0.15)'
-            : 'rgba(239, 68, 68, 0.15)';
-          const badgeLabel = isMatched ? 'Verified Match' : isPartial ? 'Partial / Inferred' : 'Critical Gap';
+            ? 'var(--color-warning-bg)'
+            : 'var(--color-danger-bg)';
+          const statusBorder = isMatched
+            ? 'var(--color-success-border)'
+            : isPartial
+            ? 'var(--color-warning-border)'
+            : 'var(--color-danger-border)';
+          const label = isMatched ? 'Verified' : isPartial ? 'Partial' : 'Missing Gap';
 
           return (
             <div
               key={`${skill.name}-${idx}`}
-              className="glass-card"
+              className="card"
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 gap: '0.65rem',
-                borderLeft: `4px solid ${badgeColor}`,
+                borderLeft: `4px solid ${statusColor}`,
               }}
             >
               <div>
@@ -292,48 +299,53 @@ export default function SkillGapPanel() {
                     style={{
                       fontSize: '0.72rem',
                       fontWeight: 600,
-                      padding: '0.2rem 0.55rem',
+                      padding: '0.15rem 0.5rem',
                       borderRadius: 'var(--radius-full)',
-                      backgroundColor: badgeBg,
-                      color: badgeColor,
+                      backgroundColor: statusBg,
+                      color: statusColor,
+                      border: `1px solid ${statusBorder}`,
                     }}
                   >
-                    {badgeLabel}
+                    {label}
                   </span>
                 </div>
 
-                <h4 style={{ fontSize: '0.92rem', fontWeight: 600, color: '#fff', margin: 0 }}>{skill.name}</h4>
+                <h4 style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>
+                  {skill.name}
+                </h4>
               </div>
 
-              {/* Evidence Quote */}
+              {/* Evidence Quote / Callout */}
               {skill.evidenceSnippet ? (
                 <div
                   style={{
-                    backgroundColor: 'rgba(7, 11, 20, 0.5)',
+                    backgroundColor: 'var(--color-bg-subtle)',
                     padding: '0.55rem 0.75rem',
                     borderRadius: 'var(--radius-sm)',
-                    border: '1px dashed var(--color-border)',
+                    border: '1px solid var(--color-border)',
                     display: 'flex',
                     gap: '0.45rem',
                     alignItems: 'flex-start',
                   }}
                 >
-                  <Quote size={13} color="var(--color-alexa-cyan)" style={{ flexShrink: 0, marginTop: '2px' }} />
-                  <p style={{ margin: 0, fontSize: '0.75rem', fontStyle: 'italic', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>
+                  <Quote size={13} color="var(--color-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <p style={{ margin: 0, fontSize: '0.78rem', fontStyle: 'italic', color: 'var(--color-text-secondary)', lineHeight: '1.45' }}>
                     "{skill.evidenceSnippet}"
                   </p>
                 </div>
               ) : (
                 <div
                   style={{
-                    backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                    backgroundColor: 'var(--color-danger-bg)',
+                    border: '1px solid var(--color-danger-border)',
                     padding: '0.45rem 0.65rem',
                     borderRadius: 'var(--radius-sm)',
-                    fontSize: '0.74rem',
-                    color: '#f87171',
+                    fontSize: '0.75rem',
+                    color: 'var(--color-danger)',
+                    fontWeight: 500,
                   }}
                 >
-                  ⚠️ Not found in resume — prioritized for your study plan schedule.
+                  Target focus area — prioritized for study plan and adaptive quizzes.
                 </div>
               )}
             </div>

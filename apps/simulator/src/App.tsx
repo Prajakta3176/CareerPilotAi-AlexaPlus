@@ -1,13 +1,13 @@
 import {
-  Sparkles,
-  Bot,
-  BrainCircuit,
-  CalendarDays,
+  Compass,
+  FileText,
+  CheckSquare,
+  Calendar,
   HelpCircle,
-  TrendingUp,
+  BarChart3,
   Terminal,
   RotateCcw,
-  FileText,
+  Sparkles,
 } from 'lucide-react';
 import { SimulatorProvider, useSimulator } from './context/SimulatorContext';
 import ChatPanel from './components/ChatPanel';
@@ -33,64 +33,74 @@ function SimulatorApp() {
 
   return (
     <div className="app">
-      {/* ── Top Navigation Bar ── */}
+      {/* ── Top SaaS Header ── */}
       <header className="app-header">
         <div className="header-left">
-          <div className="logo-container">
-            <div className="alexa-orb">
-              <Bot size={18} color="#070b14" />
+          <div className="brand-badge">
+            <div className="brand-icon">
+              <Compass size={18} />
             </div>
             <div>
-              <h1 className="logo-title">CareerPilot AI</h1>
+              <span className="brand-title">CareerPilot AI</span>
             </div>
           </div>
-          <span className="track-badge">Alexa+ Track • Hackathon 2026</span>
+          <span className="badge-tag">Alexa+ Track • Hackathon 2026</span>
         </div>
 
         <div className="header-actions">
-          <span className="session-badge" title="Active Session ID">
-            ID: {sessionId.slice(0, 14)}...
+          <span
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.72rem',
+              color: 'var(--color-text-muted)',
+              backgroundColor: 'var(--color-bg-subtle)',
+              padding: '0.25rem 0.55rem',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--color-border)',
+            }}
+          >
+            Session: {sessionId.slice(0, 12)}
           </span>
 
           <button
             type="button"
-            className={`btn ${isSampleLoaded ? 'btn-secondary' : 'btn-sample'}`}
+            className={`btn ${isSampleLoaded ? 'btn-secondary' : 'btn-subtle'}`}
             onClick={loadSampleData}
-            title="Pre-populate with realistic full-stack job & resume for instant demo"
+            title="Load realistic job description & resume for quick evaluation"
           >
-            <Sparkles size={15} />
-            {isSampleLoaded ? 'Sample Loaded ✓' : 'Load Sample Data'}
+            <Sparkles size={14} />
+            {isSampleLoaded ? 'Sample Loaded' : 'Load Demo Sample'}
           </button>
 
           <button
             type="button"
             className="btn btn-secondary"
             onClick={resetSession}
-            title="Reset and start a fresh session"
+            title="Reset session state"
           >
-            <RotateCcw size={14} />
+            <RotateCcw size={13} />
             Reset
           </button>
         </div>
       </header>
 
-      {/* ── Main Two-Column Layout ── */}
+      {/* ── Main Two-Column Structure ── */}
       <main className="app-main">
-        {/* Left Column: Alexa+ Voice & Chat Simulator */}
+        {/* Left Column: Conversational Assistant */}
         <section className="chat-panel-container">
           <ChatPanel />
         </section>
 
-        {/* Right Column: Dynamic Workspace Panels */}
+        {/* Right Column: Structured Workflow Workspace */}
         <section className="workspace-panel-container">
-          <nav className="workspace-tabs" aria-label="Workspace Tabs">
+          <nav className="workspace-tabs" aria-label="Workflow Navigation">
             <button
               type="button"
               className={`tab-btn ${activeTab === 'onboarding' ? 'active' : ''}`}
               onClick={() => setActiveTab('onboarding')}
             >
               <FileText size={15} />
-              Input & Onboarding
+              1. Job & Resume
             </button>
 
             <button
@@ -98,9 +108,8 @@ function SimulatorApp() {
               className={`tab-btn ${activeTab === 'analysis' ? 'active' : ''}`}
               onClick={() => setActiveTab('analysis')}
             >
-              <BrainCircuit size={15} />
-              Skill Gaps
-              {comparison && <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>({comparison.matchScore}%)</span>}
+              <CheckSquare size={15} />
+              2. Skill Gaps {comparison && `(${comparison.matchScore}%)`}
             </button>
 
             <button
@@ -108,9 +117,8 @@ function SimulatorApp() {
               className={`tab-btn ${activeTab === 'plan' ? 'active' : ''}`}
               onClick={() => setActiveTab('plan')}
             >
-              <CalendarDays size={15} />
-              5-Day Plan
-              {plan && <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>({plan.schedule.length}d)</span>}
+              <Calendar size={15} />
+              3. Study Plan {plan && `(${plan.schedule.length}d)`}
             </button>
 
             <button
@@ -119,7 +127,7 @@ function SimulatorApp() {
               onClick={() => setActiveTab('quiz')}
             >
               <HelpCircle size={15} />
-              Adaptive Quiz
+              4. Adaptive Quiz
             </button>
 
             <button
@@ -127,8 +135,8 @@ function SimulatorApp() {
               className={`tab-btn ${activeTab === 'progress' ? 'active' : ''}`}
               onClick={() => setActiveTab('progress')}
             >
-              <TrendingUp size={15} />
-              Progress
+              <BarChart3 size={15} />
+              5. Progress
             </button>
 
             <button
@@ -137,14 +145,16 @@ function SimulatorApp() {
               onClick={() => setActiveTab('trace')}
             >
               <Terminal size={15} />
-              MCP Tool Trace
+              MCP Tools
               {toolTraces.length > 0 && (
                 <span
                   style={{
-                    backgroundColor: 'rgba(0, 200, 255, 0.25)',
-                    padding: '0.1rem 0.4rem',
-                    borderRadius: '9999px',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    color: 'var(--color-text-secondary)',
+                    padding: '0.1rem 0.45rem',
+                    borderRadius: 'var(--radius-full)',
                     fontSize: '0.7rem',
+                    fontWeight: 600,
                   }}
                 >
                   {toolTraces.length}

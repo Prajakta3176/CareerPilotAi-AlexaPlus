@@ -30,20 +30,18 @@ export default function QuizPanel() {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
 
-  // Reset index when activeQuiz changes
   useEffect(() => {
     setCurrentIdx(0);
     setSelectedAnswers({});
   }, [activeQuiz?.quizId]);
 
-  // Trigger celebration confetti on pass
   useEffect(() => {
     if (quizResult && quizResult.passed) {
       confetti({
-        particleCount: 70,
+        particleCount: 50,
         spread: 60,
         origin: { y: 0.6 },
-        colors: ['#00c8ff', '#6366f1', '#10b981', '#ffffff'],
+        colors: ['#2563eb', '#10b981', '#6366f1'],
       });
     }
   }, [quizResult]);
@@ -55,22 +53,22 @@ export default function QuizPanel() {
       <div className="placeholder-panel">
         <div
           style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(0, 200, 255, 0.1)',
+            width: '52px',
+            height: '52px',
+            borderRadius: 'var(--radius-lg)',
+            backgroundColor: 'var(--color-primary-subtle)',
+            color: 'var(--color-primary)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: '1rem',
-            color: 'var(--color-alexa-cyan)',
           }}
         >
-          <HelpCircle size={28} />
+          <HelpCircle size={26} />
         </div>
-        <h2 style={{ color: '#fff', fontSize: '1.25rem', marginBottom: '0.5rem' }}>No Active Quiz Selected</h2>
-        <p style={{ color: 'var(--color-text-secondary)', maxWidth: '420px', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-          Test your technical recall and system design edge cases. Weak scores automatically adapt your 5-day study plan.
+        <h2>No Active Quiz Selected</h2>
+        <p>
+          Assess your technical recall and edge-case reasoning. Performance automatically updates your preparation plan.
         </p>
         <button
           type="button"
@@ -80,11 +78,11 @@ export default function QuizPanel() {
         >
           {isQuizzing ? (
             <>
-              <Loader2 size={16} className="spinner" /> Generating Questions...
+              <Loader2 size={15} className="spinner" /> Generating Questions...
             </>
           ) : (
             <>
-              <Sparkles size={16} /> Quiz Me on "{defaultTopic.split('(')[0]?.trim() || defaultTopic}"
+              <Sparkles size={15} /> Quiz Me on "{defaultTopic.split('(')[0]?.trim() || defaultTopic}"
             </>
           )}
         </button>
@@ -92,39 +90,37 @@ export default function QuizPanel() {
     );
   }
 
-  // ── Quiz Results View ──
+  // ── Results Screen ──
   if (quizResult) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-        {/* Result Header Card */}
+        {/* Score Header Card */}
         <div
-          className="glass-card"
+          className="card"
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             flexWrap: 'wrap',
             gap: '1.25rem',
-            background: quizResult.passed
-              ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%)'
-              : 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%)',
-            borderColor: quizResult.passed ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)',
+            backgroundColor: quizResult.passed ? 'var(--color-success-bg)' : 'var(--color-purple-bg)',
+            borderColor: quizResult.passed ? 'var(--color-success-border)' : 'var(--color-purple-border)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div
               style={{
-                width: '64px',
-                height: '64px',
+                width: '54px',
+                height: '54px',
                 borderRadius: '50%',
-                backgroundColor: quizResult.passed ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                backgroundColor: quizResult.passed ? '#d1fae5' : '#ede9fe',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: quizResult.passed ? '#10b981' : '#ef4444',
+                color: quizResult.passed ? 'var(--color-success)' : 'var(--color-purple)',
               }}
             >
-              {quizResult.passed ? <Award size={32} /> : <AlertTriangle size={32} />}
+              {quizResult.passed ? <Award size={28} /> : <AlertTriangle size={28} />}
             </div>
 
             <div>
@@ -133,13 +129,13 @@ export default function QuizPanel() {
                   fontFamily: 'var(--font-mono)',
                   fontSize: '0.72rem',
                   textTransform: 'uppercase',
-                  color: quizResult.passed ? '#10b981' : '#ef4444',
-                  fontWeight: 600,
+                  color: quizResult.passed ? 'var(--color-success)' : 'var(--color-purple)',
+                  fontWeight: 700,
                 }}
               >
-                {quizResult.passed ? 'Passed • Mastery Verified' : 'Review Needed • Plan Adapted'}
+                {quizResult.passed ? 'Mastery Verified' : 'Review Recommended • Plan Adapted'}
               </span>
-              <h3 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#fff', margin: '0.2rem 0' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: '0.15rem 0' }}>
                 Score: {quizResult.score}% ({quizResult.correctCount} of {quizResult.totalQuestions} Correct)
               </h3>
               <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--color-text-secondary)' }}>
@@ -169,25 +165,25 @@ export default function QuizPanel() {
           </div>
         </div>
 
-        {/* Feedback / Adaptation Notice */}
+        {/* Coach Assessment Note */}
         <div
-          className="glass-card"
+          className="card"
           style={{
             padding: '1rem 1.25rem',
-            backgroundColor: quizResult.passed ? 'rgba(16, 185, 129, 0.08)' : 'rgba(168, 85, 247, 0.12)',
-            borderColor: quizResult.passed ? 'rgba(16, 185, 129, 0.3)' : 'rgba(168, 85, 247, 0.4)',
+            backgroundColor: quizResult.passed ? 'var(--color-success-bg)' : 'var(--color-purple-bg)',
+            borderColor: quizResult.passed ? 'var(--color-success-border)' : 'var(--color-purple-border)',
             fontSize: '0.85rem',
             lineHeight: '1.5',
-            color: '#fff',
+            color: quizResult.passed ? '#065f46' : '#581c87',
           }}
         >
           <strong>Coach Assessment:</strong> {quizResult.feedback}
         </div>
 
-        {/* Question by Question Review */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-          <h4 style={{ fontSize: '0.92rem', color: 'var(--color-text-secondary)', margin: '0.5rem 0 0 0' }}>
-            Question Breakdown & Detailed Explanations
+        {/* Question Review Cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <h4 style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', margin: '0.5rem 0 0 0', fontWeight: 600 }}>
+            Question Breakdown & Explanations
           </h4>
 
           {activeQuiz.questions.map((q, idx) => {
@@ -197,12 +193,12 @@ export default function QuizPanel() {
             return (
               <div
                 key={q.id}
-                className="glass-card"
+                className="card"
                 style={{
-                  borderLeft: `4px solid ${isCorrect ? '#10b981' : '#ef4444'}`,
+                  borderLeft: `4px solid ${isCorrect ? 'var(--color-success)' : 'var(--color-danger)'}`,
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '0.65rem',
+                  gap: '0.55rem',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -211,9 +207,9 @@ export default function QuizPanel() {
                   </span>
                   <span
                     style={{
-                      fontSize: '0.72rem',
+                      fontSize: '0.74rem',
                       fontWeight: 600,
-                      color: isCorrect ? '#10b981' : '#ef4444',
+                      color: isCorrect ? 'var(--color-success)' : 'var(--color-danger)',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.3rem',
@@ -224,14 +220,16 @@ export default function QuizPanel() {
                   </span>
                 </div>
 
-                <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 600, color: '#fff' }}>{q.question}</p>
+                <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                  {q.question}
+                </p>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.8rem' }}>
-                  <div style={{ color: isCorrect ? '#10b981' : '#f87171' }}>
-                    <strong>Your Answer:</strong> {userChoice || 'No answer selected'}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', fontSize: '0.82rem' }}>
+                  <div style={{ color: isCorrect ? 'var(--color-success)' : 'var(--color-danger)' }}>
+                    <strong>Your Choice:</strong> {userChoice || 'None'}
                   </div>
                   {!isCorrect && (
-                    <div style={{ color: '#10b981' }}>
+                    <div style={{ color: 'var(--color-success)' }}>
                       <strong>Correct Answer:</strong> {q.correctOption}
                     </div>
                   )}
@@ -240,15 +238,15 @@ export default function QuizPanel() {
                 {/* Explanation */}
                 <div
                   style={{
-                    backgroundColor: 'rgba(7, 11, 20, 0.6)',
-                    padding: '0.55rem 0.85rem',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    padding: '0.55rem 0.75rem',
                     borderRadius: 'var(--radius-sm)',
                     fontSize: '0.78rem',
                     color: 'var(--color-text-secondary)',
                     border: '1px solid var(--color-border)',
                   }}
                 >
-                  <strong style={{ color: 'var(--color-alexa-cyan)' }}>Explanation:</strong> {q.explanation}
+                  <strong style={{ color: 'var(--color-text-primary)' }}>Explanation:</strong> {q.explanation}
                 </div>
               </div>
             );
@@ -258,7 +256,7 @@ export default function QuizPanel() {
     );
   }
 
-  // ── Active Quiz Question View ──
+  // ── Active Question Stepper ──
   const currentQ = activeQuiz.questions[currentIdx];
   const totalQ = activeQuiz.questions.length;
   const isLast = currentIdx === totalQ - 1;
@@ -276,7 +274,6 @@ export default function QuizPanel() {
 
   const handleNextOrSubmit = async () => {
     if (isLast) {
-      // Build submissions array
       const submissions = activeQuiz.questions.map((q) => ({
         questionId: q.id,
         selectedOption: selectedAnswers[q.id] || '',
@@ -290,14 +287,14 @@ export default function QuizPanel() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-      {/* ── Progress & Topic Header ── */}
+      {/* ── Progress Header ── */}
       <div
-        className="glass-card"
+        className="card"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '0.9rem 1.25rem',
+          padding: '0.85rem 1.25rem',
         }}
       >
         <div>
@@ -305,26 +302,27 @@ export default function QuizPanel() {
             style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '0.7rem',
-              color: 'var(--color-alexa-cyan)',
+              color: 'var(--color-primary)',
               textTransform: 'uppercase',
+              fontWeight: 600,
             }}
           >
             Topic Assessment • {activeQuiz.difficulty}
           </span>
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#fff', margin: '0.15rem 0 0 0' }}>
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: '0.1rem 0 0 0' }}>
             {activeQuiz.topic}
           </h3>
         </div>
 
         <div style={{ textAlign: 'right' }}>
-          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-alexa-cyan)' }}>
+          <span style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
             Question {currentIdx + 1} of {totalQ}
           </span>
           <div
             style={{
               width: '120px',
               height: '6px',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backgroundColor: 'var(--color-bg-subtle)',
               borderRadius: 'var(--radius-full)',
               overflow: 'hidden',
               marginTop: '0.35rem',
@@ -334,7 +332,7 @@ export default function QuizPanel() {
               style={{
                 width: `${((currentIdx + 1) / totalQ) * 100}%`,
                 height: '100%',
-                background: 'var(--gradient-alexa)',
+                backgroundColor: 'var(--color-primary)',
                 transition: 'width 250ms ease',
               }}
             />
@@ -343,12 +341,12 @@ export default function QuizPanel() {
       </div>
 
       {/* ── Question Card ── */}
-      <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', padding: '1.5rem' }}>
-        <h4 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#fff', margin: 0, lineHeight: '1.5' }}>
+      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', padding: '1.5rem' }}>
+        <h4 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0, lineHeight: '1.5' }}>
           {currentQ.question}
         </h4>
 
-        {/* Options List */}
+        {/* Options */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
           {currentQ.options.map((opt) => {
             const isSelected = selectedAnswers[currentQ.id] === opt;
@@ -362,17 +360,17 @@ export default function QuizPanel() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.85rem',
-                  padding: '0.85rem 1.1rem',
+                  padding: '0.85rem 1rem',
                   borderRadius: 'var(--radius-md)',
                   border: '1px solid',
-                  borderColor: isSelected ? 'var(--color-alexa-cyan)' : 'var(--color-border)',
-                  backgroundColor: isSelected ? 'rgba(0, 200, 255, 0.12)' : 'rgba(7, 11, 20, 0.5)',
-                  color: isSelected ? '#fff' : 'var(--color-text-secondary)',
+                  borderColor: isSelected ? 'var(--color-primary)' : 'var(--color-border)',
+                  backgroundColor: isSelected ? 'var(--color-primary-subtle)' : '#ffffff',
+                  color: isSelected ? 'var(--color-primary)' : 'var(--color-text-primary)',
                   textAlign: 'left',
                   fontSize: '0.85rem',
+                  fontWeight: isSelected ? 600 : 400,
                   cursor: 'pointer',
-                  transition: 'all 150ms ease',
-                  boxShadow: isSelected ? '0 0 14px rgba(0, 200, 255, 0.15)' : 'none',
+                  transition: 'all 120ms ease',
                 }}
               >
                 <div
@@ -381,7 +379,7 @@ export default function QuizPanel() {
                     height: '18px',
                     borderRadius: '50%',
                     border: '2px solid',
-                    borderColor: isSelected ? 'var(--color-alexa-cyan)' : 'rgba(148, 163, 184, 0.4)',
+                    borderColor: isSelected ? 'var(--color-primary)' : 'var(--color-border-subtle)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -394,7 +392,7 @@ export default function QuizPanel() {
                         width: '8px',
                         height: '8px',
                         borderRadius: '50%',
-                        backgroundColor: 'var(--color-alexa-cyan)',
+                        backgroundColor: 'var(--color-primary)',
                       }}
                     />
                   )}
@@ -405,14 +403,14 @@ export default function QuizPanel() {
           })}
         </div>
 
-        {/* Navigation Footer */}
+        {/* Footer Navigation */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
           <button
             type="button"
             onClick={() => setCurrentIdx((prev) => Math.max(0, prev - 1))}
             disabled={currentIdx === 0}
             className="btn btn-secondary"
-            style={{ opacity: currentIdx === 0 ? 0.3 : 1 }}
+            style={{ opacity: currentIdx === 0 ? 0.4 : 1 }}
           >
             <ArrowLeft size={14} /> Previous
           </button>

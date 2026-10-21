@@ -31,93 +31,85 @@ export default function ProgressPanel() {
       {/* ── Top Metric Cards ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
         {/* Overall Readiness */}
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-          <span style={{ fontSize: '0.74rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase' }}>
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+          <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
             Overall Preparation
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-            <span
-              style={{
-                fontSize: '2rem',
-                fontWeight: 800,
-                background: 'var(--gradient-alexa)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
+            <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--color-primary)' }}>
               {readinessScore}%
             </span>
-            <span style={{ fontSize: '0.78rem', color: '#10b981' }}>Readiness</span>
+            <span style={{ fontSize: '0.78rem', color: 'var(--color-success)', fontWeight: 600 }}>Readiness</span>
           </div>
-          <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
-            Weighted by plan tasks & quiz scores
+          <span style={{ fontSize: '0.74rem', color: 'var(--color-text-secondary)' }}>
+            Calculated from completed tasks & quiz scores
           </span>
         </div>
 
-        {/* Plan Tasks Done */}
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-          <span style={{ fontSize: '0.74rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase' }}>
+        {/* Plan Tasks Completed */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+          <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
             Curriculum Tasks
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-            <span style={{ fontSize: '2rem', fontWeight: 800, color: '#fff' }}>
+            <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>
               {completedDaysCount} / {totalDaysCount}
             </span>
-            <span style={{ fontSize: '0.78rem', color: 'var(--color-alexa-cyan)' }}>Days</span>
+            <span style={{ fontSize: '0.78rem', color: 'var(--color-primary)', fontWeight: 600 }}>Days</span>
           </div>
-          <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
-            {planPct}% of scheduled roadmap completed
+          <span style={{ fontSize: '0.74rem', color: 'var(--color-text-secondary)' }}>
+            {planPct}% of scheduled roadmap finished
           </span>
         </div>
 
-        {/* Quiz Performance */}
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-          <span style={{ fontSize: '0.74rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase' }}>
+        {/* Quiz Mastery */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+          <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
             Avg Quiz Mastery
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-            <span style={{ fontSize: '2rem', fontWeight: 800, color: '#10b981' }}>
+            <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--color-success)' }}>
               {avgQuizScore}%
             </span>
-            <span style={{ fontSize: '0.78rem', color: '#10b981' }}>Passed</span>
+            <span style={{ fontSize: '0.78rem', color: 'var(--color-success)', fontWeight: 600 }}>Verified</span>
           </div>
-          <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
-            Deterministic grading with explanations
+          <span style={{ fontSize: '0.74rem', color: 'var(--color-text-secondary)' }}>
+            Deterministic scoring with explanations
           </span>
         </div>
       </div>
 
-      {/* ── Topic Mastery Breakdown ── */}
-      <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      {/* ── Competency Progress Bars ── */}
+      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <TrendingUp size={18} color="var(--color-alexa-cyan)" />
-            <h4 style={{ fontSize: '0.96rem', fontWeight: 600, color: '#fff', margin: 0 }}>
-              Competency Mastery Breakdown
+            <TrendingUp size={18} color="var(--color-primary)" />
+            <h4 style={{ fontSize: '0.96rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>
+              Technical Domain Mastery
             </h4>
           </div>
           <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>
-            Updated in real-time
+            Updated dynamically after each quiz
           </span>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
           {topicSkills.map((item) => {
-            const isStrong = item.level >= 80;
-            const isMedium = item.level >= 60;
-            const barColor = isStrong ? '#10b981' : isMedium ? '#f59e0b' : '#ef4444';
+            const isHigh = item.level >= 80;
+            const isMid = item.level >= 60;
+            const barColor = isHigh ? 'var(--color-success)' : isMid ? 'var(--color-warning)' : 'var(--color-danger)';
 
             return (
               <div key={item.name} style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                  <span style={{ color: '#fff' }}>{item.name}</span>
-                  <span style={{ color: barColor, fontWeight: 600 }}>{item.level}%</span>
+                  <span style={{ color: 'var(--color-text-primary)', fontWeight: 500 }}>{item.name}</span>
+                  <span style={{ color: barColor, fontWeight: 700 }}>{item.level}%</span>
                 </div>
                 <div
                   style={{
                     width: '100%',
                     height: '6px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    backgroundColor: 'var(--color-bg-subtle)',
                     borderRadius: 'var(--radius-full)',
                     overflow: 'hidden',
                   }}
@@ -128,7 +120,7 @@ export default function ProgressPanel() {
                       height: '100%',
                       backgroundColor: barColor,
                       borderRadius: 'var(--radius-full)',
-                      transition: 'width 300ms ease',
+                      transition: 'width 250ms ease',
                     }}
                   />
                 </div>
@@ -138,9 +130,9 @@ export default function ProgressPanel() {
         </div>
       </div>
 
-      {/* ── Session & Persistence Info ── */}
+      {/* ── Session Persistence Info Card ── */}
       <div
-        className="glass-card"
+        className="card"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -151,13 +143,13 @@ export default function ProgressPanel() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-          <ShieldCheck size={20} color="#10b981" />
+          <ShieldCheck size={20} color="var(--color-success)" />
           <div>
-            <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#fff' }}>
-              Persistent Session Storage Active
+            <div style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+              Session Persisted Locally
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-              Session: {sessionId} • Stored in LocalStorage & SQLite
+              ID: {sessionId} • Stored across refreshes
             </div>
           </div>
         </div>
@@ -189,7 +181,7 @@ export default function ProgressPanel() {
             onClick={resetSession}
             className="btn btn-secondary"
             style={{ fontSize: '0.8rem' }}
-            title="Clear current state and reset"
+            title="Reset session state"
           >
             <RotateCcw size={13} /> Reset
           </button>

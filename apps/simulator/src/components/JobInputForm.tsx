@@ -34,40 +34,38 @@ export default function JobInputForm() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* ── Demo Mode Banner ── */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      {/* ── Demo Sample Mode Banner ── */}
       <div
-        className="glass-card"
+        className="card"
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: isSampleLoaded
-            ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(0, 200, 255, 0.15) 100%)'
-            : 'rgba(30, 41, 59, 0.5)',
-          borderColor: isSampleLoaded ? 'rgba(0, 200, 255, 0.4)' : 'var(--color-border)',
+          backgroundColor: isSampleLoaded ? 'var(--color-primary-subtle)' : '#ffffff',
+          borderColor: isSampleLoaded ? 'var(--color-primary-border)' : 'var(--color-border)',
           padding: '1rem 1.25rem',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div
             style={{
-              padding: '0.5rem',
-              borderRadius: '0.5rem',
-              backgroundColor: 'rgba(0, 200, 255, 0.15)',
-              color: 'var(--color-alexa-cyan)',
+              padding: '0.45rem',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: isSampleLoaded ? '#dbeafe' : 'var(--color-bg-subtle)',
+              color: 'var(--color-primary)',
             }}
           >
-            <Sparkles size={20} />
+            <Sparkles size={18} />
           </div>
           <div>
-            <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#fff', marginBottom: '0.2rem' }}>
-              {isSampleLoaded ? 'Sample Mode Active: Full-Stack Engineer' : 'Fast-Track Evaluation'}
+            <h3 style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '0.15rem' }}>
+              {isSampleLoaded ? 'Sample Mode Active: Senior Full-Stack Engineer' : 'Fast-Track Judging Evaluation'}
             </h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', margin: 0 }}>
               {isSampleLoaded
                 ? 'Sample job description and resume loaded. Ready for skill gap analysis and plan generation.'
-                : 'Click "Load Sample Data" to evaluate without pasting your personal data.'}
+                : 'Click "Load Demo Sample" to test CareerPilot AI instantly without typing personal data.'}
             </p>
           </div>
         </div>
@@ -75,123 +73,77 @@ export default function JobInputForm() {
         <button
           type="button"
           onClick={loadSampleData}
-          className="btn btn-sample"
-          style={{ whiteSpace: 'nowrap', padding: '0.5rem 1rem' }}
+          className={`btn ${isSampleLoaded ? 'btn-secondary' : 'btn-primary'}`}
+          style={{ whiteSpace: 'nowrap' }}
         >
           <Sparkles size={14} />
-          {isSampleLoaded ? 'Reload Sample' : 'Load Sample Data'}
+          {isSampleLoaded ? 'Reload Sample' : 'Load Demo Sample'}
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        {/* ── Form Inputs (Two Columns) ── */}
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        {/* ── Dual Textareas ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
           {/* Job Description Card */}
-          <div className="glass-card" style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-              <label
-                htmlFor="job-desc"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontSize: '0.88rem',
-                  fontWeight: 600,
-                  color: 'var(--color-text-primary)',
-                }}
-              >
-                <Briefcase size={16} color="var(--color-alexa-cyan)" />
+          <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="form-label">
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                <Briefcase size={16} color="var(--color-primary)" />
                 Target Job Description
-              </label>
-              <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
-                {jobText.length > 0 ? `${jobText.length} chars` : 'Required'}
+              </span>
+              <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>
+                {jobText.length > 0 ? `${jobText.length} characters` : 'Required'}
               </span>
             </div>
 
             <textarea
-              id="job-desc"
               rows={11}
               value={jobText}
               onChange={(e) => setJobText(e.target.value)}
-              placeholder="Paste the target job description, requirements, and responsibilities here..."
+              placeholder="Paste target job description, qualifications, and role requirements here..."
               required
-              style={{
-                width: '100%',
-                backgroundColor: 'rgba(7, 11, 20, 0.6)',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-md)',
-                padding: '0.85rem',
-                color: 'var(--color-text-primary)',
-                fontFamily: 'var(--font-sans)',
-                fontSize: '0.82rem',
-                lineHeight: '1.5',
-                resize: 'vertical',
-                outline: 'none',
-              }}
+              className="form-textarea"
             />
           </div>
 
           {/* Resume Card */}
-          <div className="glass-card" style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-              <label
-                htmlFor="resume-desc"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontSize: '0.88rem',
-                  fontWeight: 600,
-                  color: 'var(--color-text-primary)',
-                }}
-              >
-                <FileText size={16} color="#a855f7" />
+          <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="form-label">
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                <FileText size={16} color="var(--color-purple)" />
                 Candidate Resume / Experience
-              </label>
-              <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
-                {resumeText.length > 0 ? `${resumeText.length} chars` : 'Required'}
+              </span>
+              <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>
+                {resumeText.length > 0 ? `${resumeText.length} characters` : 'Required'}
               </span>
             </div>
 
             <textarea
-              id="resume-desc"
               rows={11}
               value={resumeText}
               onChange={(e) => setResumeText(e.target.value)}
-              placeholder="Paste candidate resume text, skills, past experience, and projects here..."
+              placeholder="Paste candidate resume text, project highlights, and technical competencies here..."
               required
-              style={{
-                width: '100%',
-                backgroundColor: 'rgba(7, 11, 20, 0.6)',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-md)',
-                padding: '0.85rem',
-                color: 'var(--color-text-primary)',
-                fontFamily: 'var(--font-sans)',
-                fontSize: '0.82rem',
-                lineHeight: '1.5',
-                resize: 'vertical',
-                outline: 'none',
-              }}
+              className="form-textarea"
             />
           </div>
         </div>
 
-        {/* ── Preferences Bar ── */}
+        {/* ── Preparation Preferences ── */}
         <div
-          className="glass-card"
+          className="card"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: '1rem',
+            gap: '1.25rem',
             alignItems: 'center',
           }}
         >
-          {/* Days selector */}
+          {/* Total Duration */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.4rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.5rem' }}>
               <Calendar size={15} color="var(--color-text-secondary)" />
-              <span style={{ fontSize: '0.84rem', fontWeight: 600 }}>Total Prep Duration</span>
+              <span style={{ fontSize: '0.84rem', fontWeight: 600 }}>Total Study Duration</span>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               {[3, 5, 7].map((d) => (
@@ -202,27 +154,28 @@ export default function JobInputForm() {
                   style={{
                     flex: 1,
                     padding: '0.45rem',
-                    borderRadius: 'var(--radius-sm)',
+                    borderRadius: 'var(--radius-md)',
                     border: '1px solid',
-                    borderColor: days === d ? 'var(--color-alexa-cyan)' : 'var(--color-border)',
-                    backgroundColor: days === d ? 'rgba(0, 200, 255, 0.15)' : 'rgba(0, 0, 0, 0.2)',
-                    color: days === d ? '#fff' : 'var(--color-text-secondary)',
+                    borderColor: days === d ? 'var(--color-primary)' : 'var(--color-border)',
+                    backgroundColor: days === d ? 'var(--color-primary-subtle)' : 'var(--color-bg-surface)',
+                    color: days === d ? 'var(--color-primary)' : 'var(--color-text-secondary)',
                     fontSize: '0.82rem',
                     fontWeight: days === d ? 600 : 500,
                     cursor: 'pointer',
+                    transition: 'all 120ms ease',
                   }}
                 >
-                  {d} Days {d === 5 && '⭐'}
+                  {d} Days {d === 5 && '• Recommended'}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Daily Study Time selector */}
+          {/* Daily Study Budget */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.4rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.5rem' }}>
               <Clock size={15} color="var(--color-text-secondary)" />
-              <span style={{ fontSize: '0.84rem', fontWeight: 600 }}>Daily Study Budget</span>
+              <span style={{ fontSize: '0.84rem', fontWeight: 600 }}>Daily Study Time</span>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               {[30, 45, 60, 90].map((m) => (
@@ -233,17 +186,18 @@ export default function JobInputForm() {
                   style={{
                     flex: 1,
                     padding: '0.45rem',
-                    borderRadius: 'var(--radius-sm)',
+                    borderRadius: 'var(--radius-md)',
                     border: '1px solid',
-                    borderColor: dailyMinutes === m ? 'var(--color-alexa-cyan)' : 'var(--color-border)',
-                    backgroundColor: dailyMinutes === m ? 'rgba(0, 200, 255, 0.15)' : 'rgba(0, 0, 0, 0.2)',
-                    color: dailyMinutes === m ? '#fff' : 'var(--color-text-secondary)',
+                    borderColor: dailyMinutes === m ? 'var(--color-primary)' : 'var(--color-border)',
+                    backgroundColor: dailyMinutes === m ? 'var(--color-primary-subtle)' : 'var(--color-bg-surface)',
+                    color: dailyMinutes === m ? 'var(--color-primary)' : 'var(--color-text-secondary)',
                     fontSize: '0.82rem',
                     fontWeight: dailyMinutes === m ? 600 : 500,
                     cursor: 'pointer',
+                    transition: 'all 120ms ease',
                   }}
                 >
-                  {m}m {m === 60 && '⭐'}
+                  {m} mins
                 </button>
               ))}
             </div>
@@ -251,37 +205,39 @@ export default function JobInputForm() {
         </div>
 
         {/* ── Submit Action ── */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '1rem' }}>
-          {!jobText.trim() || !resumeText.trim() ? (
-            <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>
-              Fill in both fields or click <strong>Load Sample Data</strong> to begin.
-            </span>
-          ) : (
-            <span style={{ fontSize: '0.82rem', color: 'var(--color-success)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-              <CheckCircle2 size={15} /> Ready to analyze
-            </span>
-          )}
+        <div style={{ display: 'flex', justifyContent: 'flex-between', alignItems: 'center' }}>
+          <div style={{ flex: 1 }}>
+            {!jobText.trim() || !resumeText.trim() ? (
+              <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>
+                Fill in both fields or click <strong>Load Demo Sample</strong> to proceed.
+              </span>
+            ) : (
+              <span style={{ fontSize: '0.82rem', color: 'var(--color-success)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <CheckCircle2 size={15} /> Ready for skill comparison
+              </span>
+            )}
+          </div>
 
           <button
             type="submit"
             disabled={!jobText.trim() || !resumeText.trim() || isAnalyzing}
             className="btn btn-primary"
             style={{
-              padding: '0.75rem 1.75rem',
-              fontSize: '0.92rem',
+              padding: '0.65rem 1.4rem',
+              fontSize: '0.88rem',
               opacity: !jobText.trim() || !resumeText.trim() || isAnalyzing ? 0.5 : 1,
               cursor: !jobText.trim() || !resumeText.trim() || isAnalyzing ? 'not-allowed' : 'pointer',
             }}
           >
             {isAnalyzing ? (
               <>
-                <Loader2 size={16} className="spinner" style={{ animation: 'spin 1s linear infinite' }} />
+                <Loader2 size={16} className="spinner" />
                 Analyzing Skill Gaps...
               </>
             ) : (
               <>
                 Run Skill Gap Analysis
-                <ArrowRight size={16} />
+                <ArrowRight size={15} />
               </>
             )}
           </button>

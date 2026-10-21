@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import type { MouseEvent } from 'react';
 import {
   Terminal,
   CheckCircle2,
@@ -23,7 +24,7 @@ export default function ToolTrace() {
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
-  const copyPayload = (item: ToolTraceItem, e: React.MouseEvent) => {
+  const copyPayload = (item: ToolTraceItem, e: MouseEvent) => {
     e.stopPropagation();
     navigator.clipboard.writeText(JSON.stringify(item, null, 2));
     setCopiedId(item.id);
@@ -42,23 +43,22 @@ export default function ToolTrace() {
       <div className="placeholder-panel">
         <div
           style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(0, 200, 255, 0.1)',
+            width: '52px',
+            height: '52px',
+            borderRadius: 'var(--radius-lg)',
+            backgroundColor: 'var(--color-primary-subtle)',
+            color: 'var(--color-primary)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: '1rem',
-            color: 'var(--color-alexa-cyan)',
           }}
         >
-          <Terminal size={28} />
+          <Terminal size={26} />
         </div>
-        <h2 style={{ color: '#fff', fontSize: '1.25rem', marginBottom: '0.5rem' }}>No MCP Tool Invocations Yet</h2>
-        <p style={{ color: 'var(--color-text-secondary)', maxWidth: '440px', lineHeight: '1.5' }}>
-          This panel observes live tool execution between CareerPilot AI and the Model Context Protocol runtime (Port 8787).
-          Trigger an action like <strong>Analyze Skills</strong> or <strong>Generate Plan</strong> to see real-time tool traces.
+        <h2>No MCP Tool Invocations Yet</h2>
+        <p>
+          This tab displays live Model Context Protocol telemetry. Trigger actions like <strong>Analyze Skills</strong> or <strong>Generate Plan</strong> to observe tool executions.
         </p>
       </div>
     );
@@ -66,9 +66,9 @@ export default function ToolTrace() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-      {/* ── Top Header & Filters ── */}
+      {/* ── Top Header ── */}
       <div
-        className="glass-card"
+        className="card"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -79,27 +79,27 @@ export default function ToolTrace() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-          <Terminal size={20} color="var(--color-alexa-cyan)" />
+          <Terminal size={18} color="var(--color-primary)" />
           <div>
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#fff', margin: 0 }}>
-              Live MCP Tool Execution Trace
+            <h3 style={{ fontSize: '0.96rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>
+              Live MCP Tool Execution Log
             </h3>
             <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
-              Specification 2025-11-25 • Truthful Trace Telemetry
+              Model Context Protocol • Streamable Telemetry
             </span>
           </div>
         </div>
 
-        {/* Filter by Tool */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        {/* Filter Dropdown */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
           <Filter size={14} color="var(--color-text-secondary)" />
           <select
             value={filterTool}
             onChange={(e) => setFilterTool(e.target.value)}
             style={{
-              backgroundColor: 'rgba(7, 11, 20, 0.7)',
+              backgroundColor: '#ffffff',
               border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-sm)',
+              borderRadius: 'var(--radius-md)',
               padding: '0.35rem 0.65rem',
               color: 'var(--color-text-primary)',
               fontSize: '0.78rem',
@@ -118,45 +118,48 @@ export default function ToolTrace() {
       </div>
 
       {/* ── Trace List ── */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
         {displayedTraces.map((trace) => {
           const isExpanded = expandedId === trace.id;
           const isSuccess = trace.status === 'success';
           const isPending = trace.status === 'pending';
 
-          const statusColor = isSuccess ? '#10b981' : isPending ? 'var(--color-alexa-cyan)' : '#ef4444';
+          const statusColor = isSuccess ? 'var(--color-success)' : isPending ? 'var(--color-primary)' : 'var(--color-danger)';
           const statusBg = isSuccess
-            ? 'rgba(16, 185, 129, 0.15)'
+            ? 'var(--color-success-bg)'
             : isPending
-            ? 'rgba(0, 200, 255, 0.15)'
-            : 'rgba(239, 68, 68, 0.15)';
+            ? 'var(--color-primary-subtle)'
+            : 'var(--color-danger-bg)';
+          const statusBorder = isSuccess
+            ? 'var(--color-success-border)'
+            : isPending
+            ? 'var(--color-primary-border)'
+            : 'var(--color-danger-border)';
 
           return (
             <div
               key={trace.id}
-              className="glass-card"
+              className="card"
               style={{
-                padding: '0.85rem 1.1rem',
+                padding: '0.85rem 1.15rem',
                 cursor: 'pointer',
-                borderColor: isExpanded ? 'var(--color-alexa-cyan)' : 'var(--color-border)',
+                borderColor: isExpanded ? 'var(--color-primary)' : 'var(--color-border)',
               }}
               onClick={() => toggleExpand(trace.id)}
             >
-              {/* Row Header */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <span
                     style={{
                       fontFamily: 'var(--font-mono)',
                       fontWeight: 600,
-                      fontSize: '0.86rem',
-                      color: '#fff',
+                      fontSize: '0.84rem',
+                      color: 'var(--color-text-primary)',
                     }}
                   >
                     tool: {trace.toolName}
                   </span>
 
-                  {/* Status Pill */}
                   <span
                     style={{
                       fontSize: '0.7rem',
@@ -165,6 +168,7 @@ export default function ToolTrace() {
                       borderRadius: 'var(--radius-full)',
                       backgroundColor: statusBg,
                       color: statusColor,
+                      border: `1px solid ${statusBorder}`,
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '0.3rem',
@@ -184,7 +188,7 @@ export default function ToolTrace() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   <span
                     style={{
-                      fontSize: '0.72rem',
+                      fontSize: '0.74rem',
                       color: 'var(--color-text-muted)',
                       display: 'flex',
                       alignItems: 'center',
@@ -195,7 +199,7 @@ export default function ToolTrace() {
                     {trace.durationMs > 0 ? `${trace.durationMs}ms` : 'active'}
                   </span>
 
-                  <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)' }}>
                     {trace.timestamp}
                   </span>
 
@@ -205,7 +209,7 @@ export default function ToolTrace() {
                     style={{
                       background: 'none',
                       border: 'none',
-                      color: copiedId === trace.id ? '#10b981' : 'var(--color-text-secondary)',
+                      color: copiedId === trace.id ? 'var(--color-success)' : 'var(--color-text-secondary)',
                       cursor: 'pointer',
                       padding: '0.2rem',
                     }}
@@ -233,19 +237,17 @@ export default function ToolTrace() {
                   }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {/* Input Payload */}
                   <div>
-                    <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>
-                      Input Arguments (Sanitized)
+                    <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
+                      Input Parameters
                     </span>
                     <pre
                       style={{
                         margin: '0.3rem 0 0 0',
                         padding: '0.65rem',
-                        backgroundColor: 'rgba(7, 11, 20, 0.75)',
+                        backgroundColor: '#0f172a',
                         borderRadius: 'var(--radius-sm)',
-                        border: '1px solid var(--color-border)',
-                        color: 'var(--color-alexa-cyan)',
+                        color: '#93c5fd',
                         fontFamily: 'var(--font-mono)',
                         fontSize: '0.74rem',
                         overflowX: 'auto',
@@ -255,20 +257,18 @@ export default function ToolTrace() {
                     </pre>
                   </div>
 
-                  {/* Output Payload */}
                   {trace.outputSummary && (
                     <div>
-                      <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>
-                        Output Result Payload
+                      <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
+                        Output Payload
                       </span>
                       <pre
                         style={{
                           margin: '0.3rem 0 0 0',
                           padding: '0.65rem',
-                          backgroundColor: 'rgba(7, 11, 20, 0.75)',
+                          backgroundColor: '#0f172a',
                           borderRadius: 'var(--radius-sm)',
-                          border: '1px solid var(--color-border)',
-                          color: '#10b981',
+                          color: '#86efac',
                           fontFamily: 'var(--font-mono)',
                           fontSize: '0.74rem',
                           overflowX: 'auto',
@@ -276,12 +276,6 @@ export default function ToolTrace() {
                       >
                         {JSON.stringify(trace.outputSummary, null, 2)}
                       </pre>
-                    </div>
-                  )}
-
-                  {trace.error && (
-                    <div style={{ color: '#ef4444', fontSize: '0.78rem' }}>
-                      <strong>Execution Error:</strong> {trace.error}
                     </div>
                   )}
                 </div>
