@@ -1,14 +1,30 @@
-/**
- * Job Analyzer Service
- * Extracts structured skills from a job description using LLM.
- */
 
-// TODO: Implement job analysis
-// - Accept raw job description text
-// - Call LLM with structured prompt
-// - Validate output with Zod schema
-// - Return typed JobAnalysis
+const skillKeywords = [
+  "JavaScript",
+  "TypeScript",
+  "React",
+  "Node.js",
+  "Java",
+  "Python",
+  "SQL",
+  "MongoDB",
+  "REST API",
+  "Git",
+  "Docker",
+  "AWS",
+  "Data Structures",
+  "Algorithms",
+];
 
-export async function analyzeJob(_jobDescription: string) {
-  throw new Error('Not implemented');
+export function analyzeJobDescription(jobDescription: string) {
+  const description = jobDescription.toLowerCase();
+
+  const requiredSkills = skillKeywords.filter((skill) =>
+    description.includes(skill.toLowerCase())
+  );
+
+  return {
+    requiredSkills,
+    totalSkills: requiredSkills.length,
+  };
 }
