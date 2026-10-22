@@ -150,7 +150,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* User Auth Profile / Login */}
-          {isAuthenticated && user ? (
+          {/* {isAuthenticated && user ? (
             <div className="user-dropdown-wrap">
               <button
                 type="button"
@@ -224,7 +224,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <LogIn size={14} />
               <span>Sign In</span>
             </button>
-          )}
+          )} */}
         </div>
       </div>
     </header>
