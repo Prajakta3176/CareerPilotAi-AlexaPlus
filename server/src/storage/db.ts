@@ -1,11 +1,10 @@
 /**
  * Database initialization and connection
- * Using better-sqlite3 for fast local MVP persistence.
+ * In-memory persistence engine with optional file/database backing.
  */
+import { repository, RepositoryStore } from './repository';
 
-// TODO: Initialize SQLite database
-// Tables: sessions, skill_analyses, plans, plan_days, quiz_attempts, quiz_answers
-
-export function initDatabase(_dbPath: string) {
-  throw new Error('Not implemented');
+export function initDatabase(_dbPath?: string): RepositoryStore {
+  console.log('[Storage] Initialized CareerPilot database store');
+  return repository;
 }
