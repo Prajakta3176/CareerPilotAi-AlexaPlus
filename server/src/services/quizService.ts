@@ -210,12 +210,12 @@ export function getQuizForTopic(topic: string): Quiz {
   };
 }
 
-export function gradeQuizSubmission(
+export async function gradeQuizSubmission(
   sessionId: string,
   quizId: string,
   topic: string,
   submissions: QuizSubmission[]
-): QuizResult {
+): Promise<QuizResult> {
   const correctCount = submissions.filter(
     (s) => s.selectedOption && s.correctOption && s.selectedOption.trim() === s.correctOption.trim()
   ).length;
@@ -238,8 +238,8 @@ export function gradeQuizSubmission(
     newPlanDayAdded: !passed ? 4 : undefined,
   };
 
-  // Record into repository
-  repository.addQuizResult(sessionId, result);
+  // Record into repository and PostgreSQL
+  await repository.addQuizResult(sessionId, result);
 
   return result;
 }

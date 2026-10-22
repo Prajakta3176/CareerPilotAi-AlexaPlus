@@ -1,6 +1,6 @@
 /**
  * CareerPilot Backend Server
- * Express API + Agent Orchestrator
+ * Express API + Agent Orchestrator + PostgreSQL Persistence
  */
 import 'dotenv/config';
 import express from 'express';
@@ -10,6 +10,7 @@ import analysisRouter from './routes/analysis';
 import plansRouter from './routes/plans';
 import quizRouter from './routes/quiz';
 import progressRouter from './routes/progress';
+import { initDatabase } from './storage/db';
 
 const app = express();
 const PORT = process.env.SERVER_PORT ?? 3001;
@@ -17,11 +18,15 @@ const PORT = process.env.SERVER_PORT ?? 3001;
 app.use(cors());
 app.use(express.json({ limit: '5mb' }));
 
+// Initialize Database persistence
+initDatabase();
+
 // Health check
 app.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
     service: 'careerpilot-server',
+    database: 'postgresql',
     timestamp: new Date().toISOString(),
   });
 });

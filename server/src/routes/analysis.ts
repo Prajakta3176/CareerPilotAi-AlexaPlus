@@ -14,7 +14,7 @@ import { repository } from '../storage/repository';
 const router = Router();
 
 // POST /api/analysis/compare
-router.post('/compare', (req: Request, res: Response) => {
+router.post('/compare', async (req: Request, res: Response) => {
   try {
     const { sessionId, jobText, resumeText } = req.body;
     if (!jobText || !resumeText) {
@@ -25,7 +25,7 @@ router.post('/compare', (req: Request, res: Response) => {
     const comparison = createSkillGapReport(resumeText, jobText);
 
     if (sessionId) {
-      repository.saveComparison(String(sessionId), comparison);
+      await repository.saveComparison(String(sessionId), comparison);
     }
 
     res.json(comparison);
@@ -36,14 +36,18 @@ router.post('/compare', (req: Request, res: Response) => {
 });
 
 // GET /api/analysis/compare/:sessionId
-router.get('/compare/:sessionId', (req: Request, res: Response) => {
-  const sessionId = String(req.params.sessionId || '');
-  const comparison = repository.getComparison(sessionId);
-  if (!comparison) {
-    res.status(404).json({ error: 'No comparison found for this session' });
-    return;
+router.get('/compare/:sessionId', async (req: Request, res: Response) => {
+  try {
+    const sessionId = String(req.params.sessionId || '');
+    const comparison = await repository.getComparison(sessionId);
+    if (!comparison) {
+      res.status(404).json({ error: 'No comparison found for this session' });
+      return;
+    }
+    res.json(comparison);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
-  res.json(comparison);
 });
 
 // POST /api/analysis/job
