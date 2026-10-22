@@ -233,32 +233,70 @@ def query_rag(session_id: str, query: str, top_k: int = 4) -> Dict[str, Any]:
     resume_hits = [r for r in retrieved if r["source"] == "resume"]
     job_hits = [r for r in retrieved if r["source"] == "job"]
     kb_hits = [r for r in retrieved if r["source"] in ("amazon_lp", "technical_pattern")]
+    lp_hits = [r for r in kb_hits if r["source"] == "amazon_lp"]
+    tech_hits = [r for r in kb_hits if r["source"] == "technical_pattern"]
 
     # Synthesize grounded answer
     answer_parts = []
     citations = []
 
-    if resume_hits:
-        answer_parts.append(f"**From your Resume ({resume_hits[0]['title']}):**\n\"{resume_hits[0]['content'][:250]}...\"")
-        citations.append({"type": "resume", "section": resume_hits[0]["title"], "snippet": resume_hits[0]["content"][:180]})
+    if kb_hits and not resume_hits and not job_hits:
+        # No documents uploaded yet — give a standalone knowledge-base answer
+        hit = kb_hits[0]
+        meta = None
+        for h in search_result.points:
+            if h.payload.get("title") == hit["title"]:
+                meta = h.payload.get("metadata") or {}
+                break
 
-    if job_hits:
-        answer_parts.append(f"**Target Job Expectation ({job_hits[0]['title']}):**\n\"{job_hits[0]['content'][:250]}...\"")
-        citations.append({"type": "job", "section": job_hits[0]["title"], "snippet": job_hits[0]["content"][:180]})
+        if lp_hits:
+            lp_meta = meta or {}
+            answer_parts.append(
+                f"**{hit['title']}** (Amazon Leadership Principle)\n\n"
+                f"{lp_meta.get('description', hit['content'][:300])}\n\n"
+                f"**Sample interview question:** {lp_meta.get('sample_question', 'Tell me about a time you demonstrated this principle.')}\n\n"
+                f"**Evaluation criteria:** {lp_meta.get('eval_criteria', 'STAR structure, specificity, outcome focus.')}"
+            )
+        else:
+            tp_meta = meta or {}
+            answer_parts.append(
+                f"**{hit['title']}** (Technical Architecture)\n\n"
+                f"Core concepts: {', '.join(tp_meta.get('core_concepts', [hit['content'][:200]]))}\n\n"
+                f"**Interview tip:** {tp_meta.get('interview_tip', hit['content'][-200:])}"
+            )
+        citations.append({"type": "knowledge_base", "topic": hit["title"], "snippet": hit["content"][:200]})
 
-    if kb_hits:
-        answer_parts.append(f"**Interview Strategy Tip ({kb_hits[0]['title']}):**\n{kb_hits[0]['content'][:220]}")
-        citations.append({"type": "knowledge_base", "topic": kb_hits[0]["title"], "snippet": kb_hits[0]["content"][:180]})
+    else:
+        # Documents are loaded — ground the answer in resume + job context
+        if resume_hits:
+            answer_parts.append(f"**From your Resume ({resume_hits[0]['title']}):**\n\"{resume_hits[0]['content'][:280]}...\"")
+            citations.append({"type": "resume", "section": resume_hits[0]["title"], "snippet": resume_hits[0]["content"][:180]})
+
+        if job_hits:
+            answer_parts.append(f"**Target Job Expectation ({job_hits[0]['title']}):**\n\"{job_hits[0]['content'][:280]}...\"")
+            citations.append({"type": "job", "section": job_hits[0]["title"], "snippet": job_hits[0]["content"][:180]})
+
+        if kb_hits:
+            answer_parts.append(f"**Interview Strategy Tip ({kb_hits[0]['title']}):**\n{kb_hits[0]['content'][:250]}")
+            citations.append({"type": "knowledge_base", "topic": kb_hits[0]["title"], "snippet": kb_hits[0]["content"][:180]})
 
     if not answer_parts:
-        summary_answer = "I searched your resume and job description. Please ensure you have loaded or uploaded a job description and resume to receive personalized citations."
+        summary_answer = (
+            "I searched my knowledge base but could not find a strong match. "
+            "Try asking about: AWS Lambda, DynamoDB, Redis caching, Amazon Leadership Principles, "
+            "skill gaps, or your study plan."
+        )
     else:
         summary_answer = "\n\n".join(answer_parts)
+
+    # Build sources list for frontend to detect context type
+    sources = list({r["source"] for r in retrieved})
 
     return {
         "query": query,
         "answer": summary_answer,
         "citations": citations,
+        "sources": sources,
         "retrieved_count": len(retrieved),
         "chunks": retrieved
     }

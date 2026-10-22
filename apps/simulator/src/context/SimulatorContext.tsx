@@ -1,5 +1,5 @@
-/**
- * CareerPilot Simulator — Central State Context
+﻿/**
+ * CareerPilot Simulator â€” Central State Context
  * Holds session data, conversation messages, plan, quiz state, and live tool traces.
  */
 
@@ -91,12 +91,12 @@ Core Skills:
 JavaScript, TypeScript, React, Next.js, Node.js, Express, HTML5 / CSS3, Git, PostgreSQL, Jest, TailwindCSS.
 
 Experience:
-Frontend / Full-Stack Engineer — Apex Web Tech (2023 - Present)
+Frontend / Full-Stack Engineer â€” Apex Web Tech (2023 - Present)
 - Built responsive client portals with React and TypeScript, boosting engagement by 35%.
 - Created Node.js REST endpoints for user authentication and profile management.
 - Integrated PostgreSQL database models using Prisma ORM.
 
-Junior Web Developer — PixelCraft Studios (2021 - 2023)
+Junior Web Developer â€” PixelCraft Studios (2021 - 2023)
 - Maintained single-page applications using JavaScript, HTML, and CSS.
 - Refactored legacy codebases to modern TypeScript standards.
 
@@ -346,21 +346,70 @@ export const SimulatorProvider: React.FC<{ children: ReactNode }> = ({ children 
         const prog = await fetchProgress(sessionId);
         setProgress(prog);
       } else {
-        // Echo assistant response
-        setTimeout(() => {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `msg_${Date.now()}`,
-              role: 'assistant',
-              content: `Understood! You can ask me to "Analyze skills", "Generate plan", or "Quiz me on AWS".`,
-              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              suggestedActions: ['Analyze Skills', 'Generate Plan', 'Take Quiz'],
-            },
-          ]);
-        }, 500);
-      }
-    },
+        // --- RAG: query the Python AI service for a real answer ---
+        const thinkingId = `msg_thinking_${Date.now()}`;
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: thinkingId,
+            role: 'assistant',
+            content: 'Thinking...',
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          },
+        ]);
+
+        try {
+          const ragRes = await fetch('/rag/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId, query: content, top_k: 4 }),
+          });
+
+          let answer: string;
+          let suggestedActions: string[] | undefined;
+
+          if (ragRes.ok) {
+            const data = await ragRes.json();
+            answer = data.answer || 'I could not find a relevant answer. Try asking about AWS, Redis, skill gaps, or the Amazon Leadership Principles.';
+            const sources: string[] = data.sources || [];
+            if (sources.some((s) => s.includes('leadership'))) {
+              suggestedActions = ['Tell me more about Customer Obsession', 'List all Amazon LPs', 'Practice LP interview question'];
+            } else if (sources.some((s) => s.includes('technical'))) {
+              suggestedActions = ['Explain Redis caching', 'What is DynamoDB best for?', 'How does AWS Lambda scale?'];
+            } else {
+              suggestedActions = ['Analyze Skills', 'Generate Plan', 'Take Quiz'];
+            }
+          } else {
+            answer = 'My AI knowledge service is not reachable. Start it with: python -m uvicorn app.main:app --port 8000 --reload inside the ai-service/ folder.';
+            suggestedActions = ['Analyze Skills', 'Generate Plan', 'Take Quiz'];
+          }
+
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === thinkingId
+                ? {
+                    ...m,
+                    content: answer,
+                    suggestedActions,
+                    toolCalls: ragRes.ok ? ['rag_query'] : undefined,
+                  }
+                : m
+            )
+          );
+        } catch {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === thinkingId
+                ? {
+                    ...m,
+                    content: 'Could not reach the AI service. Start it with: python -m uvicorn app.main:app --port 8000 --reload',
+                    suggestedActions: ['Analyze Skills', 'Generate Plan'],
+                  }
+                : m
+            )
+          );
+        }
+      }    },
     [jobText, resumeText, loadSampleData, runAnalysis, createPlan, plan, startQuiz, sessionId]
   );
 
