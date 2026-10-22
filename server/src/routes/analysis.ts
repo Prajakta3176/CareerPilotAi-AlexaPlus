@@ -1,6 +1,7 @@
 /**
  * Analysis Routes
  * POST /api/analysis/compare — Compare skills between job and resume
+ * POST /api/analysis/rag-query — Forward questions to Python Qdrant RAG engine
  * POST /api/analysis/job — Extract skills from job description
  * POST /api/analysis/resume — Extract skills from resume
  * GET  /api/analysis/compare/:sessionId — Retrieve cached comparison
@@ -26,12 +27,53 @@ router.post('/compare', async (req: Request, res: Response) => {
 
     if (sessionId) {
       await repository.saveComparison(String(sessionId), comparison);
+
+      // Asynchronously trigger Python RAG indexing in Qdrant Vector DB
+      fetch('http://127.0.0.1:8000/rag/index', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: String(sessionId),
+          resume_text: resumeText,
+          job_text: jobText,
+        }),
+      }).catch(() => {
+        // AI service running in parallel / optional
+      });
     }
 
     res.json(comparison);
   } catch (error: any) {
     console.error('[Route /analysis/compare] Error:', error);
     res.status(500).json({ error: error.message || 'Failed to compare skills' });
+  }
+});
+
+// POST /api/analysis/rag-query
+router.post('/rag-query', async (req: Request, res: Response) => {
+  try {
+    const { sessionId, query, topK = 4 } = req.body;
+    const response = await fetch('http://127.0.0.1:8000/rag/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id: String(sessionId || ''),
+        query: String(query || ''),
+        top_k: Number(topK) || 4,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`RAG service error ${response.status}`);
+    }
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error: any) {
+    res.status(503).json({
+      error: 'Python RAG service offline at port 8000',
+      details: error.message,
+    });
   }
 });
 
