@@ -1,6 +1,6 @@
 /**
  * CareerPilot Backend Server
- * Express API + Agent Orchestrator (Groq-powered)
+ * Express API + Agent Orchestrator (Groq-powered) + PostgreSQL Persistence
  */
 import 'dotenv/config';
 import express from 'express';
@@ -11,12 +11,16 @@ import plansRouter from './routes/plans';
 import quizRouter from './routes/quiz';
 import progressRouter from './routes/progress';
 import chatRouter from './routes/chat';
+import { initDatabase } from './storage/db';
 
 const app = express();
 const PORT = process.env.SERVER_PORT ?? 3001;
 
 app.use(cors());
 app.use(express.json({ limit: '5mb' }));
+
+// Initialize Database persistence
+initDatabase();
 
 // Health check
 app.get('/health', (_req, res) => {
@@ -25,6 +29,7 @@ app.get('/health', (_req, res) => {
     service: 'careerpilot-server',
     llm: process.env.GROQ_API_KEY ? 'groq-connected' : 'no-key',
     model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+    database: 'postgresql',
     timestamp: new Date().toISOString(),
   });
 });

@@ -1,5 +1,10 @@
 /**
- * Analysis Routes — now async, LLM-powered
+ * Analysis Routes — LLM-powered + Qdrant RAG integration
+ * POST /api/analysis/compare — Compare skills between job and resume
+ * POST /api/analysis/rag-query — Forward questions to Python Qdrant RAG engine
+ * POST /api/analysis/job — Extract skills from job description
+ * POST /api/analysis/resume — Extract skills from resume
+ * GET  /api/analysis/compare/:sessionId — Retrieve cached comparison
  */
 import { Router, Request, Response } from 'express';
 import { createSkillGapReport } from '../services/planner';
@@ -21,7 +26,20 @@ router.post('/compare', async (req: Request, res: Response) => {
     const comparison = await createSkillGapReport(resumeText, jobText);
 
     if (sessionId) {
-      repository.saveComparison(String(sessionId), comparison);
+      await repository.saveComparison(String(sessionId), comparison);
+
+      // Asynchronously trigger Python RAG indexing in Qdrant Vector DB
+      fetch('http://127.0.0.1:8000/rag/index', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: String(sessionId),
+          resume_text: resumeText,
+          job_text: jobText,
+        }),
+      }).catch(() => {
+        // AI service running in parallel / optional
+      });
     }
 
     res.json(comparison);
@@ -31,15 +49,47 @@ router.post('/compare', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/analysis/compare/:sessionId
-router.get('/compare/:sessionId', (req: Request, res: Response) => {
-  const sessionId = String(req.params.sessionId || '');
-  const comparison = repository.getComparison(sessionId);
-  if (!comparison) {
-    res.status(404).json({ error: 'No comparison found for this session' });
-    return;
+// POST /api/analysis/rag-query
+router.post('/rag-query', async (req: Request, res: Response) => {
+  try {
+    const { sessionId, query, topK = 4 } = req.body;
+    const response = await fetch('http://127.0.0.1:8000/rag/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id: String(sessionId || ''),
+        query: String(query || ''),
+        top_k: Number(topK) || 4,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`RAG service error ${response.status}`);
+    }
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error: any) {
+    res.status(503).json({
+      error: 'Python RAG service offline at port 8000',
+      details: error.message,
+    });
   }
-  res.json(comparison);
+});
+
+// GET /api/analysis/compare/:sessionId
+router.get('/compare/:sessionId', async (req: Request, res: Response) => {
+  try {
+    const sessionId = String(req.params.sessionId || '');
+    const comparison = await repository.getComparison(sessionId);
+    if (!comparison) {
+      res.status(404).json({ error: 'No comparison found for this session' });
+      return;
+    }
+    res.json(comparison);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // POST /api/analysis/job

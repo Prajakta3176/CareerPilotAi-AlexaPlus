@@ -150,12 +150,12 @@ Rules:
   }
 }
 
-export function gradeQuizSubmission(
+export async function gradeQuizSubmission(
   sessionId: string,
   quizId: string,
   topic: string,
   submissions: QuizSubmission[]
-): QuizResult {
+): Promise<QuizResult> {
   // Fix: handle empty submissions without recording a false failure
   if (!submissions || submissions.length === 0) {
     return {
@@ -190,8 +190,8 @@ export function gradeQuizSubmission(
     adaptedTopic: !passed ? topic : undefined,
   };
 
-  // Record into repository
-  repository.addQuizResult(sessionId, result);
+  // Record into repository and Postgres
+  await repository.addQuizResult(sessionId, result);
 
   return result;
 }

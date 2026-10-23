@@ -22,9 +22,9 @@ router.post('/', async (req: Request, res: Response) => {
     const orchestrator = orchestrators.get(sid)!;
 
     const contextData = {
-      skillGap: repository.getComparison(sid),
-      studyPlan: repository.getPlan(sid),
-      quizHistory: repository.getQuizHistory(sid),
+      skillGap: await repository.getComparison(sid),
+      studyPlan: await repository.getPlan(sid),
+      quizHistory: await repository.getQuizHistory(sid),
     };
 
     let reply: string;
