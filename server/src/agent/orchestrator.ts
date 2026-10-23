@@ -58,9 +58,17 @@ Missing Skills: ${g.missing?.map((s: any) => s.name).join(', ') || 'none'}`;
       this.conversationHistory.push({ role: 'assistant', content: reply });
 
       return reply;
-    } catch (err) {
-      console.error('[Orchestrator] chat error:', err);
-      return "I'm having trouble responding right now. Please try again in a moment.";
+    } catch (err: any) {
+      console.error('[Orchestrator] chat error:', err?.message || err);
+      const rawKey = process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY || '';
+      if (!rawKey.trim()) {
+        return "⚠️ GROQ_API_KEY is not detected. Please ensure your .env file contains a valid GROQ_API_KEY=gsk_... and restart the server.";
+      }
+      if (contextData?.skillGap) {
+        const missing = contextData.skillGap.missing?.map((s: any) => s.name).join(', ') || 'none';
+        return `I had a temporary issue calling the AI model (${err?.message || 'error'}), but for ${contextData.skillGap.targetRole || 'your role'}, your key skills to prepare are: ${missing}. Check your Study Plan tab!`;
+      }
+      return `I'm having trouble connecting to the AI model (${err?.message || 'please try again'}). Please verify your GROQ_API_KEY in .env and restart.`;
     }
   }
 
