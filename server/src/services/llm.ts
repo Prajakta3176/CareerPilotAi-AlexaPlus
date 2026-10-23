@@ -18,7 +18,8 @@ function getApiKey(): string {
 }
 
 function getBaseUrl(): string {
-  if (process.env.GROQ_API_KEY) {
+  const provider = (process.env.LLM_PROVIDER || 'groq').toLowerCase();
+  if (provider === 'groq' || process.env.GROQ_API_KEY) {
     return 'https://api.groq.com/openai/v1';
   }
   return process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
@@ -46,6 +47,44 @@ const CANDIDATE_MODELS = [
 // Deduplicate candidate models
 const UNIQUE_MODELS = Array.from(new Set(CANDIDATE_MODELS));
 let verifiedWorkingModel: string | null = null;
+
+export async function testGroqConnection(): Promise<any> {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    return {
+      status: 'error',
+      reason: 'GROQ_API_KEY is missing or empty in .env',
+      keyDetected: false,
+    };
+  }
+
+  const maskedKey = apiKey.length > 8 ? `${apiKey.slice(0, 6)}...${apiKey.slice(-4)}` : '***';
+  const client = createClient();
+  const model = (process.env.GROQ_MODEL || 'llama-3.1-8b-instant').trim().replace(/^["']|["']$/g, '');
+
+  try {
+    const res = await client.chat.completions.create({
+      model,
+      messages: [{ role: 'user', content: 'Say "hello" in 1 word.' }],
+      max_tokens: 10,
+    });
+    return {
+      status: 'success',
+      modelUsed: model,
+      keyMasked: maskedKey,
+      reply: res.choices[0]?.message?.content,
+    };
+  } catch (err: any) {
+    return {
+      status: 'error',
+      modelAttempted: model,
+      keyMasked: maskedKey,
+      statusCode: err?.status || err?.statusCode,
+      errorMessage: err?.message,
+      errorDetails: err?.error || err,
+    };
+  }
+}
 
 export async function callLLM(systemPrompt: string, userPrompt: string): Promise<string> {
   const apiKey = getApiKey();
@@ -82,7 +121,6 @@ export async function callLLM(systemPrompt: string, userPrompt: string): Promise
         console.warn(`[LLM] Model "${model}" not available on this Groq account. Trying fallback model...`);
         continue;
       }
-      // For rate limits or auth errors, throw immediately
       console.error(`[LLM] Error with model "${model}":`, err?.message || err);
       throw new Error(`LLM call failed: ${err?.message || 'Unknown error'}`);
     }

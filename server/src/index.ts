@@ -19,6 +19,7 @@ import quizRouter from './routes/quiz';
 import progressRouter from './routes/progress';
 import chatRouter from './routes/chat';
 import { initDatabase } from './storage/db';
+import { testGroqConnection } from './services/llm';
 
 const app = express();
 const PORT = process.env.SERVER_PORT ?? 3001;
@@ -42,6 +43,12 @@ app.get('/health', (_req, res) => {
   });
 });
 
+// Diagnostic check for Groq
+app.get('/api/test-groq', async (_req, res) => {
+  const result = await testGroqConnection();
+  res.json(result);
+});
+
 // Mount route modules
 app.use('/api/analysis', analysisRouter);
 app.use('/api/plans', plansRouter);
@@ -54,5 +61,6 @@ app.listen(PORT, () => {
   console.log(`🚀 CareerPilot Server running on http://127.0.0.1:${PORT}`);
   console.log(`   LLM: ${hasGroq ? 'Groq connected' : '⚠️ GROQ_API_KEY missing'} (${process.env.GROQ_MODEL || 'llama-3.1-8b-instant'})`);
   console.log(`   Health: http://127.0.0.1:${PORT}/health`);
+  console.log(`   Groq Test: http://127.0.0.1:${PORT}/api/test-groq`);
   console.log(`   Routes: /api/analysis, /api/plans, /api/quiz, /api/progress, /api/chat`);
 });
