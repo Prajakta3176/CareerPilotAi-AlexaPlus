@@ -182,15 +182,21 @@ export const SimulatorProvider: React.FC<{ children: ReactNode }> = ({ children 
       setComparison(res);
       setActiveTab('analysis');
 
+      // Dynamic message using actual analysis results — no hardcoded domain
+      const topMissing = res.missing?.slice(0, 3).map((s: any) => s.name).join(', ') || '';
+      const gapSummary = res.missingCount > 0
+        ? `identified ${res.missingCount} gap${res.missingCount !== 1 ? 's' : ''} to address${topMissing ? `: ${topMissing}` : ''}`
+        : 'strong match across all required skills';
+
       setMessages((prev) => [
         ...prev,
         {
           id: `msg_${Date.now()}`,
           role: 'assistant',
-          content: `Analysis complete! You have a **${res.matchScore}% Match** for this role. I found ${res.matchedCount} verified skills and identified ${res.missingCount} critical gaps (notably in AWS Serverless and Redis Caching). Would you like me to generate your study plan?`,
+          content: `Analysis complete! You have a **${res.matchScore}% Match** for this role. I found ${res.matchedCount} verified skills and ${gapSummary}. Would you like me to generate your personalized study plan?`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           toolCalls: ['compare_skills'],
-          suggestedActions: ['Generate 5-Day Plan', 'Inspect Missing Gaps'],
+          suggestedActions: ['Generate Study Plan', 'Inspect Missing Gaps'],
         },
       ]);
     } finally {
@@ -205,12 +211,16 @@ export const SimulatorProvider: React.FC<{ children: ReactNode }> = ({ children 
       setPlan(res);
       setActiveTab('plan');
 
+      // Dynamic message using actual plan data — no hardcoded topics
+      const day1Topic = res.schedule?.[0]?.topic || 'your first priority topic';
+      const targetRole = (res as any).targetRole || 'your target role';
+
       setMessages((prev) => [
         ...prev,
         {
           id: `msg_${Date.now()}`,
           role: 'assistant',
-          content: `Here is your customized **${days}-Day Preparation Plan** (${dailyMinutes} mins/day). Day 1 focuses on AWS Serverless Architecture. You can check off tasks as you finish or take an adaptive quiz right now!`,
+          content: `Here is your customized **${days}-Day Preparation Plan** (${dailyMinutes} mins/day) for **${targetRole}**. Day 1 focuses on **${day1Topic}**. Check off tasks as you finish or take an adaptive quiz on any topic!`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           toolCalls: ['generate_plan'],
           suggestedActions: ['Start Day 1 Quiz', 'View Full Timeline'],
@@ -252,16 +262,19 @@ export const SimulatorProvider: React.FC<{ children: ReactNode }> = ({ children 
         const result = await submitQuizAnswers(sessionId, activeQuiz.quizId, activeQuiz.topic, submissions);
         setQuizResult(result);
 
-        // If score is weak (<70), adapt the plan by adding a review session
+        // If score is weak (<70), adapt the first incomplete plan day dynamically
         if (!result.passed && plan) {
           setPlan((prevPlan) => {
             if (!prevPlan) return null;
-            const updatedSchedule = prevPlan.schedule.map((day) => {
-              if (day.day === 4) {
+            // Find first incomplete day to adapt — not hardcoded to a fixed day number
+            const targetIdx = prevPlan.schedule.findIndex((d) => !d.completed);
+            const adaptIdx = targetIdx !== -1 ? targetIdx : prevPlan.schedule.length - 1;
+            const updatedSchedule = prevPlan.schedule.map((day, idx) => {
+              if (idx === adaptIdx) {
                 return {
                   ...day,
                   topic: `Reinforcement: ${result.topic}`,
-                  objective: `Reinforce concepts following quiz score of ${result.score}%.`,
+                  objective: `Reinforce and deepen understanding following quiz score of ${result.score}%.`,
                   adapted: true,
                 };
               }
@@ -282,8 +295,8 @@ export const SimulatorProvider: React.FC<{ children: ReactNode }> = ({ children 
             role: 'assistant',
             content: `You scored **${result.score}%** on ${result.topic}. ${
               result.passed
-                ? 'Great job, you passed! I have logged this to your progress.'
-                : 'Since you scored under 70%, I have automatically adapted Day 4 of your study plan to review this topic.'
+                ? 'Great job, you passed! Progress has been logged.'
+                : `Since you scored under 70%, I have automatically updated your next study session to reinforce ${result.topic}.`
             }`,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             toolCalls: ['record_quiz_result'],
@@ -308,10 +321,18 @@ export const SimulatorProvider: React.FC<{ children: ReactNode }> = ({ children 
         sessionId,
         overallProgress: pct,
         completedDays: updated.filter((d) => d.completed).map((d) => d.day),
-        totalQuizzesTaken: prevProg?.totalQuizzesTaken || 1,
-        averageQuizScore: prevProg?.averageQuizScore || 85,
+        totalQuizzesTaken: prevProg?.totalQuizzesTaken || 0,
+        averageQuizScore: prevProg?.averageQuizScore || 0,
         topicMastery: prevProg?.topicMastery || {},
       }));
+
+      // Persist day completion to server (fire-and-forget)
+      const isNowCompleted = updated.find((d) => d.day === dayNum)?.completed ?? true;
+      fetch(`http://localhost:3001/api/plans/${sessionId}/day/${dayNum}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ completed: isNowCompleted }),
+      }).catch((err) => console.warn('[toggleDayCompletion] Server sync failed:', err));
 
       return { ...prev, schedule: updated };
     });
@@ -327,8 +348,33 @@ export const SimulatorProvider: React.FC<{ children: ReactNode }> = ({ children 
       };
       setMessages((prev) => [...prev, userMsg]);
 
-      // Conversational intent parser
+      // Conversational intent parser — tries /api/chat first, falls back to local routing
       const lower = content.toLowerCase();
+      try {
+        const chatRes = await fetch('http://localhost:3001/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId, message: content }),
+        });
+        if (chatRes.ok) {
+          const { reply } = await chatRes.json();
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `msg_${Date.now()}`,
+              role: 'assistant',
+              content: reply,
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              suggestedActions: ['Analyze Skills', 'Generate Plan', 'Take Quiz'],
+            },
+          ]);
+          return;
+        }
+      } catch {
+        // Server unavailable — fall through to local intent routing
+      }
+
+      // Local intent routing fallback
       if (lower.includes('sample')) {
         loadSampleData();
       } else if (lower.includes('analyze') || lower.includes('gap')) {
@@ -339,26 +385,25 @@ export const SimulatorProvider: React.FC<{ children: ReactNode }> = ({ children 
       } else if (lower.includes('plan') || lower.includes('schedule')) {
         await createPlan();
       } else if (lower.includes('quiz')) {
-        const topic = plan?.schedule[0]?.topic || 'AWS Serverless Architecture';
+        const topic = plan?.schedule[0]?.topic || 'General Knowledge';
         await startQuiz(topic);
       } else if (lower.includes('progress')) {
         setActiveTab('progress');
         const prog = await fetchProgress(sessionId);
         setProgress(prog);
       } else {
-        // Echo assistant response
         setTimeout(() => {
           setMessages((prev) => [
             ...prev,
             {
               id: `msg_${Date.now()}`,
               role: 'assistant',
-              content: `Understood! You can ask me to "Analyze skills", "Generate plan", or "Quiz me on AWS".`,
+              content: `Understood! You can ask me to "Analyze skills", "Generate plan", or "Take a quiz on [any topic]".`,
               timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
               suggestedActions: ['Analyze Skills', 'Generate Plan', 'Take Quiz'],
             },
           ]);
-        }, 500);
+        }, 300);
       }
     },
     [jobText, resumeText, loadSampleData, runAnalysis, createPlan, plan, startQuiz, sessionId]
