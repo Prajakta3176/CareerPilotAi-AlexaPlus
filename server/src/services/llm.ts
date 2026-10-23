@@ -1,6 +1,7 @@
 /**
  * LLM Service — Groq via OpenAI-compatible API
  * Domain-agnostic: works for any job, any field.
+ * Includes auto-detection & fallback across available Groq models.
  */
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
@@ -13,11 +14,6 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 function getApiKey(): string {
   const raw = process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY || '';
-  return raw.trim().replace(/^["']|["']$/g, '');
-}
-
-function getModel(): string {
-  const raw = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
   return raw.trim().replace(/^["']|["']$/g, '');
 }
 
@@ -36,6 +32,21 @@ function createClient(): OpenAI {
   });
 }
 
+// Model cascade: try user-configured model first, then auto-fallback to supported Groq models
+const CANDIDATE_MODELS = [
+  (process.env.GROQ_MODEL || 'llama-3.1-8b-instant').trim().replace(/^["']|["']$/g, ''),
+  'llama-3.1-8b-instant',
+  'llama-3.3-70b-versatile',
+  'llama-3.1-70b-versatile',
+  'llama3-70b-8192',
+  'llama3-8b-8192',
+  'mixtral-8x7b-32768',
+];
+
+// Deduplicate candidate models
+const UNIQUE_MODELS = Array.from(new Set(CANDIDATE_MODELS));
+let verifiedWorkingModel: string | null = null;
+
 export async function callLLM(systemPrompt: string, userPrompt: string): Promise<string> {
   const apiKey = getApiKey();
   if (!apiKey) {
@@ -44,23 +55,40 @@ export async function callLLM(systemPrompt: string, userPrompt: string): Promise
   }
 
   const client = createClient();
-  const model = getModel();
+  const modelsToTry = verifiedWorkingModel
+    ? [verifiedWorkingModel, ...UNIQUE_MODELS.filter((m) => m !== verifiedWorkingModel)]
+    : UNIQUE_MODELS;
 
-  try {
-    const response = await client.chat.completions.create({
-      model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature: 0.2,
-      max_tokens: 4096,
-    });
-    return response.choices[0]?.message?.content || '';
-  } catch (err: any) {
-    console.error(`[LLM] callLLM error with model ${model}:`, err?.message || err);
-    throw new Error(`LLM call failed: ${err?.message || 'Unknown error'}`);
+  let lastError: any = null;
+
+  for (const model of modelsToTry) {
+    try {
+      const response = await client.chat.completions.create({
+        model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.2,
+        max_tokens: 4096,
+      });
+
+      verifiedWorkingModel = model;
+      return response.choices[0]?.message?.content || '';
+    } catch (err: any) {
+      lastError = err;
+      const isNotFound = err?.status === 404 || err?.message?.includes('does not exist') || err?.message?.includes('not have access');
+      if (isNotFound) {
+        console.warn(`[LLM] Model "${model}" not available on this Groq account. Trying fallback model...`);
+        continue;
+      }
+      // For rate limits or auth errors, throw immediately
+      console.error(`[LLM] Error with model "${model}":`, err?.message || err);
+      throw new Error(`LLM call failed: ${err?.message || 'Unknown error'}`);
+    }
   }
+
+  throw new Error(`LLM call failed after trying models [${modelsToTry.join(', ')}]: ${lastError?.message || 'Unknown error'}`);
 }
 
 export async function callLLMJSON<T>(systemPrompt: string, userPrompt: string): Promise<T> {
@@ -71,23 +99,39 @@ export async function callLLMJSON<T>(systemPrompt: string, userPrompt: string): 
   }
 
   const client = createClient();
-  const model = getModel();
+  const modelsToTry = verifiedWorkingModel
+    ? [verifiedWorkingModel, ...UNIQUE_MODELS.filter((m) => m !== verifiedWorkingModel)]
+    : UNIQUE_MODELS;
 
-  try {
-    const response = await client.chat.completions.create({
-      model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature: 0.2,
-      max_tokens: 4096,
-      response_format: { type: 'json_object' },
-    });
-    const content = response.choices[0]?.message?.content || '{}';
-    return JSON.parse(content) as T;
-  } catch (err: any) {
-    console.error(`[LLM] callLLMJSON error with model ${model}:`, err?.message || err);
-    throw new Error(`LLM JSON call failed: ${err?.message || 'Unknown error'}`);
+  let lastError: any = null;
+
+  for (const model of modelsToTry) {
+    try {
+      const response = await client.chat.completions.create({
+        model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.2,
+        max_tokens: 4096,
+        response_format: { type: 'json_object' },
+      });
+
+      verifiedWorkingModel = model;
+      const content = response.choices[0]?.message?.content || '{}';
+      return JSON.parse(content) as T;
+    } catch (err: any) {
+      lastError = err;
+      const isNotFound = err?.status === 404 || err?.message?.includes('does not exist') || err?.message?.includes('not have access');
+      if (isNotFound) {
+        console.warn(`[LLM] Model "${model}" not available for JSON on this Groq account. Trying fallback model...`);
+        continue;
+      }
+      console.error(`[LLM] Error with model "${model}":`, err?.message || err);
+      throw new Error(`LLM JSON call failed: ${err?.message || 'Unknown error'}`);
+    }
   }
+
+  throw new Error(`LLM JSON call failed after trying models [${modelsToTry.join(', ')}]: ${lastError?.message || 'Unknown error'}`);
 }
