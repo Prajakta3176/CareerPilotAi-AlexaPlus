@@ -36,7 +36,7 @@ app.get('/health', (_req, res) => {
     status: 'ok',
     service: 'careerpilot-server',
     llm: hasGroq ? 'groq-connected' : 'missing-api-key',
-    model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+    model: process.env.GROQ_MODEL || 'llama-3.1-8b-instant',
     database: 'postgresql',
     timestamp: new Date().toISOString(),
   });
@@ -52,7 +52,7 @@ app.use('/api/chat', chatRouter);
 app.listen(PORT, () => {
   const hasGroq = Boolean(process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.trim().length > 0);
   console.log(`🚀 CareerPilot Server running on http://127.0.0.1:${PORT}`);
-  console.log(`   LLM: ${hasGroq ? 'Groq connected' : '⚠️ GROQ_API_KEY missing'} (${process.env.GROQ_MODEL || 'llama-3.3-70b-versatile'})`);
+  console.log(`   LLM: ${hasGroq ? 'Groq connected' : '⚠️ GROQ_API_KEY missing'} (${process.env.GROQ_MODEL || 'llama-3.1-8b-instant'})`);
   console.log(`   Health: http://127.0.0.1:${PORT}/health`);
   console.log(`   Routes: /api/analysis, /api/plans, /api/quiz, /api/progress, /api/chat`);
 });
